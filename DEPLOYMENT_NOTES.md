@@ -1,9 +1,17 @@
 # 🚀 TournamentPro Deployment Notes
 
-## Temporary Changes for Render Deployment
+## Changes Made for Render Deployment
 
-### Image Processing Disabled
-**Issue**: Pillow (PIL) package was causing build failures on Render due to missing wheels for Python 3.13/3.11.
+### 1. Python Version Changed
+**Issue**: Python 3.13 had compatibility issues with eventlet and other packages.
+**Fix**: Switched to Python 3.10.14 in `runtime.txt` for better package compatibility.
+
+### 2. Eventlet to Gevent Migration
+**Issue**: Eventlet is incompatible with Python 3.13 due to removed `ssl.wrap_socket` function.
+**Fix**: Switched from eventlet to gevent worker in Gunicorn and Flask-SocketIO configuration.
+
+### 3. Image Processing Disabled
+**Issue**: Pillow (PIL) package was causing build failures on Render due to missing wheels.
 
 **Temporary Fix Applied**:
 - Removed `Pillow==9.5.0` from `requirements.txt`

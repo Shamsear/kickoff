@@ -6,7 +6,7 @@ bind = f"0.0.0.0:{os.environ.get('PORT', '10000')}"
 
 # Worker processes
 workers = 1  # SocketIO requires single worker
-worker_class = "eventlet"  # Required for SocketIO
+worker_class = "gevent"  # Compatible with SocketIO and Python 3.13
 worker_connections = 1000
 
 # Logging

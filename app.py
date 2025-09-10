@@ -18,7 +18,7 @@ def create_app():
     app.config.from_object(Config)
     
     # Initialize SocketIO
-    socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+    socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
     
     # Initialize Supabase
     init_supabase()

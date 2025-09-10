@@ -28,6 +28,6 @@ mkdir -p static/uploads/documents
 echo "🔍 Verifying critical packages:"
 pip list | grep Flask
 pip list | grep gunicorn
-pip list | grep eventlet
+pip list | grep gevent
 
 echo "✅ Build completed successfully!"
