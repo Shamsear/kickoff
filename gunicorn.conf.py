@@ -5,8 +5,8 @@ import os
 bind = f"0.0.0.0:{os.environ.get('PORT', '10000')}"
 
 # Worker processes
-workers = 1  # SocketIO requires single worker
-worker_class = "gevent"  # Compatible with SocketIO and Python 3.13
+workers = 1  # SocketIO with threading mode works with single worker
+worker_class = "sync"  # Simple sync worker, compatible with threading mode
 worker_connections = 1000
 
 # Logging

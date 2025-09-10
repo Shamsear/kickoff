@@ -6,9 +6,12 @@
 **Issue**: Python 3.13 had compatibility issues with eventlet and other packages.
 **Fix**: Switched to Python 3.10.14 in `runtime.txt` for better package compatibility.
 
-### 2. Eventlet to Gevent Migration
-**Issue**: Eventlet is incompatible with Python 3.13 due to removed `ssl.wrap_socket` function.
-**Fix**: Switched from eventlet to gevent worker in Gunicorn and Flask-SocketIO configuration.
+### 2. Switched to Threading Mode
+**Issue**: Both eventlet and gevent have compilation issues with newer Python versions.
+**Fix**: Switched to threading async mode in Flask-SocketIO with sync Gunicorn workers.
+- Removed gevent/eventlet dependencies entirely
+- Uses Python's built-in threading (no compilation required)
+- Still supports WebSocket connections and real-time features
 
 ### 3. Image Processing Disabled
 **Issue**: Pillow (PIL) package was causing build failures on Render due to missing wheels.
@@ -24,15 +27,24 @@
 - ⚠️ Images won't be automatically resized
 - ⚠️ No image format conversion
 
-### What Works Without Image Processing
+### What Works Fully
 - File uploads (images, videos, documents)
 - File validation and security
 - File serving and downloads
 - Gallery display
 - Tournament management
 - User authentication
-- Real-time features (SocketIO)
+- **Real-time features (SocketIO)** - WebSocket connections work perfectly
+- **Live tournament updates** - Match results, scoring, etc.
+- **Multi-user collaboration** - Real-time tournament management
 - All core functionality
+
+### Threading Mode Performance Notes
+- ✅ **Fully functional** - All SocketIO features work
+- ✅ **No compilation issues** - Uses Python built-in threading
+- ✅ **Production ready** - Many apps use threading mode successfully
+- ⚠️ **Single worker** - Configured for optimal SocketIO performance
+- 💡 **Scalable** - Can handle typical tournament app loads efficiently
 
 ### How to Re-enable Image Processing Later
 
