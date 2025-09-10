@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: tournamentpro
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn -c gunicorn.conf.py start:application"
+    plan: free
+    healthCheckPath: "/"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: false
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: SUPABASE_ANON_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: APP_NAME
+        value: TournamentPro
+      - key: APP_VERSION
+        value: "1.0.0"
+      - key: MAX_CONTENT_LENGTH
+        value: "16777216"
+      - key: UPLOAD_FOLDER
+        value: "static/uploads"

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 60%; right: 20%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { top: 40%; left: 80%; animation-delay: 4s; }
+    .floating-shape:nth-child(4) { bottom: 20%; left: 20%; animation-delay: 1s; }
+    .floating-shape:nth-child(5) { bottom: 40%; right: 10%; animation-delay: 3s; }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    .login-card {
+        backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(76, 175, 80, 0.2);
+        box-shadow: 0 20px 40px rgba(76, 175, 80, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-gradient min-h-screen flex items-center justify-center relative">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+    <div class="floating-shape w-16 h-16 bg-yellow-300 rounded-full"></div>
+    <div class="floating-shape w-24 h-24 bg-white rounded-full"></div>
+    <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+    <div class="floating-shape w-18 h-18 bg-white rounded-full"></div>
+    
+    <div class="max-w-md w-full px-6 relative z-10">
+        <div class="login-card rounded-3xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-2xl w-20 h-20 mx-auto flex items-center justify-center mb-6 shadow-lg">
+                    <img src="/static/images/logow.png" alt="Kickoff Arena" class="h-10 w-auto filter brightness-0 invert">
+                </div>
+                <h1 class="text-3xl font-black text-gray-900 mb-2">Welcome Back!</h1>
+                <p class="text-gray-600">Sign in to your <span class="font-bold text-green-600">Kickoff Arena</span> account</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-envelope text-green-600 mr-2"></i>Email Address
+                    </label>
+                    <input id="email" name="email" type="email" required 
+                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                           placeholder="your@email.com">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-lock text-green-600 mr-2"></i>Password
+                    </label>
+                    <input id="password" name="password" type="password" required 
+                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                           placeholder="Enter your password">
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" 
+                               class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </label>
+                    </div>
+                    
+                    <div class="text-sm">
+                        <a href="#" class="text-green-600 hover:text-green-700 font-semibold">
+                            Forgot password?
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <button type="submit" id="login-btn"
+                            class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3.5 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <i class="fas fa-sign-in-alt mr-2" id="login-icon"></i>
+                        <i class="fas fa-spinner fa-spin mr-2 hidden" id="login-spinner"></i>
+                        <span id="login-text">Sign In</span>
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Divider -->
+            <div class="my-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">New to Kickoff Arena?</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sign Up Link -->
+            <div class="text-center">
+                <a href="{{ url_for('auth.register') }}" 
+                   class="inline-flex items-center justify-center w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-user-plus mr-2 text-green-600"></i>
+                    Create Free Account
+                </a>
+            </div>
+            
+            <!-- Quick Demo Link -->
+            <div class="text-center mt-6">
+                <a href="{{ url_for('main.explore') }}" class="text-sm text-gray-500 hover:text-green-600 transition-colors">
+                    <i class="fas fa-eye mr-1"></i>Browse tournaments as guest
+                </a>
+            </div>
+        </div>
+        
+        <!-- Trust Indicators -->
+        <div class="flex justify-center items-center space-x-6 mt-8 text-gray-600 text-sm">
+            <div class="flex items-center space-x-1">
+                <i class="fas fa-shield-alt text-green-500"></i>
+                <span>Secure Login</span>
+            </div>
+            <div class="flex items-center space-x-1">
+                <i class="fas fa-users text-blue-500"></i>
+                <span>12k+ Users</span>
+            </div>
+            <div class="flex items-center space-x-1">
+                <i class="fas fa-trophy text-amber-500"></i>
+                <span>Free Forever</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Enhanced loading state management for login
+    const form = document.querySelector('form');
+    const loginBtn = document.getElementById('login-btn');
+    const loginIcon = document.getElementById('login-icon');
+    const loginSpinner = document.getElementById('login-spinner');
+    const loginText = document.getElementById('login-text');
+    
+    form.addEventListener('submit', function() {
+        // Show loading state
+        loginBtn.disabled = true;
+        loginIcon.classList.add('hidden');
+        loginSpinner.classList.remove('hidden');
+        loginText.textContent = 'Signing in...';
+    });
+    
+    // Enhanced form validation feedback
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    
+    [emailInput, passwordInput].forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value && this.checkValidity()) {
+                this.classList.remove('border-red-300', 'focus:ring-red-500');
+                this.classList.add('border-green-300');
+            } else if (this.value && !this.checkValidity()) {
+                this.classList.remove('border-green-300');
+                this.classList.add('border-red-300', 'focus:ring-red-500');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

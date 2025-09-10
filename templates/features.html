@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}Features - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Enhanced gradient backgrounds with animated patterns */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+        animation: gradientShift 8s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%); }
+        50% { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 25%, #86efac 50%, #4ade80 75%, #10b981 100%); }
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23fff' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    
+    /* Enhanced feature card styling with glassmorphism */
+    .feature-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 32px 64px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+    
+    /* Feature highlight animations */
+    .feature-highlight {
+        position: relative;
+    }
+    
+    .feature-highlight::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #10b981, #34d399, #6ee7b7, #10b981);
+        border-radius: inherit;
+        z-index: -1;
+        filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        animation: rotate 4s linear infinite;
+    }
+    
+    .feature-highlight:hover::after {
+        opacity: 0.4;
+    }
+    
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Features Header with Breadcrumbs -->
+    <div class="hero-gradient shadow">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumb -->
+            <nav class="flex pt-20 pb-3" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <div>
+                            <a href="{{ url_for('main.index') }}" class="text-gray-600 hover:text-gray-700 text-sm">
+                                <i class="fas fa-home"></i>
+                                <span class="sr-only">Home</span>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 text-xs mx-3"></i>
+                            <span class="text-sm font-semibold text-gray-900">Features</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="md:flex md:items-center md:justify-between pb-8">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900">
+                        <i class="fas fa-star text-green-600 mr-3"></i>
+                        Complete Tournament Management
+                    </h1>
+                    <p class="mt-2 text-base text-gray-700">
+                        Everything you need to create, manage, and run professional tournaments from start to finish
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Tournament Creation & Management -->
+        <div class="mb-20">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Tournament Creation & Management</h2>
+                <p class="text-xl text-gray-600">Professional tournament organization made simple</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow p-6 feature-card feature-highlight">
+                    <div class="bg-green-100 text-green-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Tournament Builder</h3>
+                    <p class="text-gray-600">Create tournaments in minutes with our intuitive step-by-step wizard. Set up rules, formats, and schedules effortlessly.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-blue-100 text-blue-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Solo & Team Support</h3>
+                    <p class="text-gray-600">Host both individual player tournaments and team-based competitions with flexible participant management.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-purple-100 text-purple-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-cog text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Flexible Settings</h3>
+                    <p class="text-gray-600">Configure entry fees, prize pools, registration deadlines, and tournament visibility settings.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Formats -->
+        <div class="mb-20">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Supported Tournament Formats</h2>
+                <p class="text-xl text-gray-600">Professional formats for every type of competition</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-red-100 text-red-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-layer-group text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Single Elimination</h3>
+                    <p class="text-gray-600">Classic knockout format. Lose once and you're out. Perfect for high-stakes competitions.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-orange-100 text-orange-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-undo text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Double Elimination</h3>
+                    <p class="text-gray-600">Second chance format with winners and losers brackets. More fair and engaging.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-blue-100 text-blue-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-repeat text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Round Robin</h3>
+                    <p class="text-gray-600">Everyone plays everyone. Ideal for leagues and ensuring all participants get maximum play time.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-green-100 text-green-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">League Play</h3>
+                    <p class="text-gray-600">Season-long competitions with standings, stats tracking, and championship playoffs.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration & Participant Management -->
+        <div class="mb-20">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Registration & Participant Management</h2>
+                <p class="text-xl text-gray-600">Streamlined registration with powerful management tools</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow p-6 feature-card">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                                <i class="fas fa-user-plus text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Easy Registration</h3>
+                                <p class="text-gray-600">Simple registration forms for solo players and team creation with player management.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6 feature-card">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                                <i class="fas fa-search text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Registration Lookup</h3>
+                                <p class="text-gray-600">Participants can easily check their registration status and tournament details.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6 feature-card">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+                                <i class="fas fa-edit text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Live Participant Management</h3>
+                                <p class="text-gray-600">Add, edit, or remove participants even after tournament creation. Full control at your fingertips.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-8 feature-card">
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">
+                            <i class="fas fa-chart-bar text-green-600 mr-2"></i>Registration Dashboard
+                        </h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                <span class="text-sm font-medium text-gray-700">Total Registered</span>
+                                <span class="text-2xl font-bold text-green-600">24 / 32</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                                <span class="text-sm font-medium text-gray-700">Teams Formed</span>
+                                <span class="text-lg font-bold text-blue-600">8 teams</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                                <span class="text-sm font-medium text-gray-700">Registration Status</span>
+                                <span class="text-sm font-bold text-yellow-600">Open</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Management & Scoring -->
+        <div class="mb-20">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Match Management & Live Scoring</h2>
+                <p class="text-xl text-gray-600">Professional match handling with real-time updates</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-green-100 text-green-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Automatic Match Generation</h3>
+                    <p class="text-gray-600">Brackets and match schedules are automatically created based on your chosen format.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-orange-100 text-orange-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-clipboard-list text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Live Score Entry</h3>
+                    <p class="text-gray-600">Update match scores in real-time from any device. Results instantly propagate throughout the tournament.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="bg-purple-100 text-purple-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-medal text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Multiple Scoring Systems</h3>
+                    <p class="text-gray-600">Win/loss tracking, points-based systems, and goal differential scoring options.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Sport & Game Support -->
+        <div class="mb-20">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Multi-Sport & Game Support</h2>
+                <p class="text-xl text-gray-600">Perfect for any sport or esports competition</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div class="text-center p-4 bg-white rounded-lg feature-card">
+                    <i class="fas fa-futbol text-4xl text-green-600 mb-2"></i>
+                    <p class="text-sm font-medium">Soccer</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg feature-card">
+                    <i class="fas fa-basketball-ball text-4xl text-orange-600 mb-2"></i>
+                    <p class="text-sm font-medium">Basketball</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg feature-card">
+                    <i class="fas fa-volleyball-ball text-4xl text-blue-600 mb-2"></i>
+                    <p class="text-sm font-medium">Volleyball</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg feature-card">
+                    <i class="fas fa-table-tennis text-4xl text-green-600 mb-2"></i>
+                    <p class="text-sm font-medium">Table Tennis</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg feature-card">
+                    <i class="fas fa-gamepad text-4xl text-purple-600 mb-2"></i>
+                    <p class="text-sm font-medium">Esports</p>
+                </div>
+                <div class="text-center p-4 bg-white rounded-lg feature-card">
+                    <i class="fas fa-running text-4xl text-red-600 mb-2"></i>
+                    <p class="text-sm font-medium">Athletics</p>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <p class="text-gray-600">...and many more! Kickoff Arena adapts to any sport or competitive game.</p>
+            </div>
+        </div>
+
+        <!-- Public Features -->
+        <div class="mb-20">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Public Tournament Features</h2>
+                <p class="text-xl text-gray-600">Share your tournaments with the world</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow p-6 feature-card">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                                <i class="fas fa-globe text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Public Tournament Directory</h3>
+                                <p class="text-gray-600">Make your tournaments discoverable in our public directory for maximum participation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6 feature-card">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                                <i class="fas fa-share-alt text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Easy Sharing</h3>
+                                <p class="text-gray-600">Share tournament links directly with participants or on social media platforms.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6 feature-card">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
+                                <i class="fas fa-eye text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Live Tournament Viewing</h3>
+                                <p class="text-gray-600">Anyone can follow along with live brackets, scores, and standings without registration.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-8 feature-card">
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">
+                            <i class="fas fa-chart-line text-green-600 mr-2"></i>Tournament Analytics
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Page Views</span>
+                                <span class="text-lg font-bold text-gray-900">2,347</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Registration Clicks</span>
+                                <span class="text-lg font-bold text-gray-900">156</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-600">Social Shares</span>
+                                <span class="text-lg font-bold text-gray-900">43</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Get Started CTA -->
+        <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-2xl p-12 text-center feature-card">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to Create Your Tournament?</h2>
+            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                Join thousands of organizers who trust Kickoff Arena to run their competitions. 
+                Get started in minutes with our intuitive tournament builder.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ url_for('auth.register') if not session.user_id else url_for('tournament.create') }}"
+                   class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5">
+                    <i class="fas fa-plus mr-2"></i>{{ 'Create Free Account' if not session.user_id else 'Create Tournament' }}
+                </a>
+                <a href="{{ url_for('main.explore') }}"
+                   class="inline-flex items-center justify-center px-8 py-4 border border-gray-200 text-lg font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-all duration-200">
+                    <i class="fas fa-search mr-2"></i>Explore Public Tournaments
+                </a>
+            </div>
+            <div class="mt-6 text-sm text-gray-500">
+                <p>✅ Free forever &nbsp;•&nbsp; ✅ No limits on tournaments &nbsp;•&nbsp; ✅ Professional features included</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

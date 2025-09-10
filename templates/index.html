@@ -1,0 +1,1095 @@
+{% extends "base.html" %}
+
+{% block title %}Kickoff Arena - Create Football Tournaments in 3 Minutes{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+            position: relative;
+            overflow: hidden;
+        }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        animation: float 20s infinite linear;
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 60%; right: 20%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { top: 40%; left: 80%; animation-delay: 4s; }
+    .floating-shape:nth-child(4) { bottom: 20%; left: 20%; animation-delay: 1s; }
+    .floating-shape:nth-child(5) { bottom: 40%; right: 10%; animation-delay: 3s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+        .hero-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15);
+        }
+    
+    .pulse-ring {
+        animation: pulseRing 2s ease-out infinite;
+    }
+    
+    @keyframes pulseRing {
+        0% {
+            transform: scale(0.33);
+            opacity: 1;
+        }
+        80%, 100% {
+            opacity: 0;
+            transform: scale(2.5);
+        }
+    }
+    
+        .floating-cta {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .floating-cta::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b, #10b981, #34d399);
+            border-radius: inherit;
+            z-index: -1;
+            filter: blur(6px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .floating-cta:hover::before {
+            opacity: 0.5;
+        }
+    
+    /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border-radius: 50%;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            transform: translateY(100px);
+            opacity: 0;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+        }
+    
+    .fab.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+        .fab:hover {
+            transform: scale(1.15);
+            box-shadow: 0 16px 48px rgba(16, 185, 129, 0.5);
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+    
+    .fab i {
+        color: white;
+        font-size: 24px;
+        transition: transform 0.3s ease;
+    }
+    
+    .fab:hover i {
+        transform: rotate(90deg);
+    }
+    
+    /* Scroll reveal animations */
+    .scroll-reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.6s ease;
+    }
+    
+    .scroll-reveal.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Progress bar */
+    .scroll-progress {
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, #10b981, #3b82f6);
+        z-index: 1001;
+        transition: width 0.3s ease;
+    }
+    
+        /* Enhanced card animations */
+        .feature-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .feature-card:hover::before {
+            left: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #1a2332 0%, #4CAF50 50%, #66BB6A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .icon-gradient {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Enhanced mobile menu */
+        @media (max-width: 1024px) {
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+            }
+            
+            .fab i {
+                font-size: 20px;
+            }
+        }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Performance: Use passive listeners and requestAnimationFrame
+    let scrollTimer = null;
+    
+    // Scroll reveal with intersection observer
+    const revealEls = document.querySelectorAll('.scroll-reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { 
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+    });
+    
+    // Lazy load scroll reveals when page is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            revealEls.forEach(el => revealObserver.observe(el));
+        });
+    } else {
+        revealEls.forEach(el => revealObserver.observe(el));
+    }
+
+    // Optimized scroll handling
+    const fab = document.getElementById('fab');
+    const progress = document.getElementById('scroll-progress');
+    
+    function updateScrollElements() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (scrollTop / docHeight) * 100;
+        
+        if (progress) {
+            progress.style.width = Math.min(100, Math.max(0, scrolled)) + '%';
+        }
+        
+        if (fab) {
+            if (scrollTop > 300) {
+                fab.classList.add('show');
+            } else {
+                fab.classList.remove('show');
+            }
+        }
+    }
+    
+    window.addEventListener('scroll', () => {
+        if (scrollTimer) return;
+        scrollTimer = requestAnimationFrame(() => {
+            updateScrollElements();
+            scrollTimer = null;
+        });
+    }, { passive: true });
+    
+    // Accessibility: Focus management for modals and dropdowns
+    document.addEventListener('keydown', (e) => {
+        // Escape key closes mobile menu
+        if (e.key === 'Escape') {
+            const mobileMenu = document.querySelector('[x-data*="mobileMenuOpen"]');
+            if (mobileMenu && mobileMenu.__x) {
+                mobileMenu.__x.$data.mobileMenuOpen = false;
+            }
+        }
+    });
+    
+    // Preload critical resources
+    const criticalLinks = document.querySelectorAll('a[href*="tournament.create"], a[href*="auth.register"]');
+    const linkPreloader = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const link = entry.target;
+                const preloadLink = document.createElement('link');
+                preloadLink.rel = 'prefetch';
+                preloadLink.href = link.href;
+                document.head.appendChild(preloadLink);
+                linkPreloader.unobserve(link);
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    criticalLinks.forEach(link => linkPreloader.observe(link));
+    
+    // Reduced motion support
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.style.scrollBehavior = 'auto';
+        // Disable complex animations for users who prefer reduced motion
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+    
+    // Performance: Preload fonts
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'preload';
+    fontLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2';
+    fontLink.as = 'font';
+    fontLink.type = 'font/woff2';
+    fontLink.crossOrigin = 'anonymous';
+    document.head.appendChild(fontLink);
+</script>
+{% endblock %}
+
+<div id="scroll-progress" class="scroll-progress"></div>
+<a href="{{ url_for('tournament.create') }}" id="fab" class="fab" aria-label="Create tournament quickly">
+    <i class="fas fa-plus"></i>
+</a>
+
+{% block content %}
+<!-- Enhanced Hero Section -->
+<section class="hero-gradient min-h-screen flex items-center relative pt-20" role="banner" aria-label="Main hero section">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+    <div class="floating-shape w-16 h-16 bg-yellow-300 rounded-full"></div>
+    <div class="floating-shape w-24 h-24 bg-white rounded-full"></div>
+    <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+    <div class="floating-shape w-18 h-18 bg-white rounded-full"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Side - Content -->
+            <div class="text-center lg:text-left">
+                <!-- Enhanced Badge -->
+                <div class="inline-flex items-center hero-card text-green-800 px-6 py-3 rounded-full text-sm font-bold mb-8 animate-fadeIn">
+                    <img src="/static/images/logow.png" alt="Kickoff Arena" class="h-8 w-auto mr-3">
+                    Kickoff Arena — Tournament Platform
+                    <div class="ml-2 px-2 py-1 bg-green-500/20 rounded-full text-xs font-black text-green-700">TRUSTED</div>
+                </div>
+                
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-gray-900 mb-6 animate-fadeIn leading-none">
+                    Create Epic<br>
+                    <span class="gradient-text animate-pulse">
+                        Football
+                    </span><br>
+                    <span class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-700">
+                        Tournaments
+                    </span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-gray-700 mb-8 max-w-2xl mx-auto lg:mx-0 animate-fadeIn leading-relaxed font-medium" style="animation-delay: 0.2s;">
+                    From idea to live tournament in 
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-lg font-black text-xl inline-block transform -rotate-1 shadow-lg">
+                        3 minutes
+                    </span>
+                    <br class="hidden sm:block">
+                    No coding. No hassle. Just pure football action! ⚽
+                </p>
+                
+                <!-- Enhanced Action Buttons -->
+                <div class="animate-fadeIn space-y-6" style="animation-delay: 0.4s;">
+                    {% if not session.user_id %}
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+                            <a href="{{ url_for('auth.register') }}" 
+                               class="floating-cta group bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 text-gray-900 px-10 py-5 rounded-2xl text-xl font-black transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300/50 w-full sm:w-auto" 
+                               aria-label="Start creating tournaments for free">
+                                <div class="flex items-center justify-center">
+                                    <i class="fas fa-rocket mr-3 text-2xl group-hover:animate-bounce"></i>
+                                    <div>
+                                        <div class="text-xl font-black">Start Building Now</div>
+                                        <div class="text-sm opacity-80 font-bold">Free Forever • No Credit Card</div>
+                                    </div>
+                                </div>
+                            </a>
+                            
+                            <div class="flex items-center space-x-4 text-white/80">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 bg-green-400 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">A</div>
+                            <div class="w-8 h-8 bg-blue-400 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">B</div>
+                            <div class="w-8 h-8 bg-purple-400 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">C</div>
+                            <div class="w-8 h-8 bg-orange-400 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold">+</div>
+                        </div>
+                        <div class="text-sm font-medium">
+                            <div class="font-bold text-white">{{ '{:,}'.format(platform_stats.total_participants) }}+ players</div>
+                            <div class="text-white/70">already competing</div>
+                        </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-stretch">
+                            <a href="{{ url_for('tournament.create') }}?mode=solo" 
+                               class="floating-cta group bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-6 rounded-2xl text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300/50 flex-1 sm:flex-initial"
+                               aria-label="Create a solo 1v1 tournament">
+                                <div class="text-center">
+                                    <i class="fas fa-user text-3xl mb-2 group-hover:scale-110 transition-transform block"></i>
+                                    <div class="font-black text-lg">Solo Tournament</div>
+                                    <div class="text-sm opacity-90">1v1 Battles</div>
+                                </div>
+                            </a>
+                            
+                            <div class="flex items-center justify-center px-4">
+                                <div class="text-white/70 text-lg font-bold bg-white/10 px-4 py-2 rounded-full border border-white/20">OR</div>
+                            </div>
+                            
+                            <a href="{{ url_for('tournament.create') }}?mode=team" 
+                               class="floating-cta group bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-6 rounded-2xl text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300/50 flex-1 sm:flex-initial"
+                               aria-label="Create a team co-op tournament">
+                                <div class="text-center">
+                                    <i class="fas fa-users text-3xl mb-2 group-hover:scale-110 transition-transform block"></i>
+                                    <div class="font-black text-lg">Team Tournament</div>
+                                    <div class="text-sm opacity-90">Squad Battles</div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Trust Indicators -->
+                    <div class="flex flex-wrap justify-center lg:justify-start items-center gap-6 text-gray-600 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="font-semibold">Free Forever</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-alt text-blue-500"></i>
+                            <span class="font-semibold">Secure & Private</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-mobile-alt text-purple-500"></i>
+                            <span class="font-semibold">Works Everywhere</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-bolt text-amber-500"></i>
+                            <span class="font-semibold">3-Min Setup</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Visual Element -->
+            <div class="relative hidden lg:block animate-fadeIn" style="animation-delay: 0.6s;">
+                <div class="relative">
+                    <!-- Main Preview Card -->
+                    <div class="hero-card rounded-3xl p-8 transform rotate-3 hover:rotate-6 transition-transform duration-500">
+                        <div class="bg-white rounded-2xl p-6 shadow-2xl">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-900">Summer Football Cup 2024</h3>
+                                    <p class="text-green-600 text-sm font-medium flex items-center">
+                                        <i class="fas fa-circle text-green-400 mr-2 animate-pulse"></i>16 players • Live
+                                    </p>
+                                </div>
+                                <div class="bg-gradient-to-r from-green-400 to-blue-500 p-3 rounded-xl">
+                                    <i class="fas fa-trophy text-white text-xl"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold">A</div>
+                                        <span class="font-semibold text-gray-900">Alex_Pro</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-lg font-bold text-gray-900 animate-pulse">2 - 1</div>
+                                        <div class="text-xs text-green-600 font-medium">FINAL</div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <span class="font-semibold text-gray-900">Mike_FC</span>
+                                        <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">M</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200">
+                                    <div class="flex items-center text-orange-700">
+                                        <i class="fas fa-crown mr-3 text-yellow-500"></i>
+                                        <div>
+                                            <div class="font-bold">Championship Match!</div>
+                                            <div class="text-sm opacity-80">Winner takes all</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Elements -->
+                    <div class="absolute -top-4 -left-4 w-16 h-16 bg-yellow-300 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                        <i class="fas fa-futbol text-gray-800 text-xl"></i>
+                    </div>
+                    
+                    <div class="absolute -bottom-4 -right-4 w-12 h-12 bg-green-400 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                        <i class="fas fa-fire text-white text-lg"></i>
+                    </div>
+                    
+                    <div class="absolute top-1/2 -left-8 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                        <i class="fas fa-star text-white text-sm"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div class="hero-card rounded-full p-3">
+            <i class="fas fa-chevron-down text-white text-xl"></i>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Start Steps -->
+<section class="py-12 bg-white border-b border-gray-100" aria-labelledby="how-it-works-heading">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 id="how-it-works-heading" class="text-2xl font-bold text-gray-900 text-center mb-8 scroll-reveal">How it works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center group scroll-reveal">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-2xl font-bold text-green-600">1</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Pick Format</h3>
+                <p class="text-gray-600">Choose Solo (1v1) or Team tournaments</p>
+            </div>
+            <div class="text-center group scroll-reveal" style="transition-delay: 0.2s;">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-2xl font-bold text-blue-600">2</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Add Details</h3>
+                <p class="text-gray-600">Name, rules, and player limits</p>
+            </div>
+            <div class="text-center group scroll-reveal" style="transition-delay: 0.4s;">
+                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-2xl font-bold text-purple-600">3</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Share & Play</h3>
+                <p class="text-gray-600">Send link to players and start</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Tournaments Section -->
+{% if recent_tournaments %}
+<section class="py-16 bg-gradient-to-br from-gray-50 to-green-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 scroll-reveal">
+            <h2 class="text-2xl sm:text-3xl font-bold gradient-text mb-3">Live Tournaments</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Join active tournaments or see what's happening right now</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for tournament in recent_tournaments %}
+            <div class="feature-card p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                        <span class="text-sm font-semibold text-green-600">{{ tournament.status.replace('_', ' ').title() }}</span>
+                    </div>
+                    <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        {{ tournament.type.title() }}
+                    </div>
+                </div>
+                
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ tournament.name }}</h3>
+                <p class="text-sm text-gray-600 mb-4">{{ tournament.description[:100] }}{% if tournament.description|length > 100 %}...{% endif %}</p>
+                
+                <div class="space-y-2 mb-4">
+                    {% if tournament.type == 'solo' and tournament.get('participant_count') %}
+                        <div class="text-xs text-gray-500">{{ tournament.participant_count }} / {{ tournament.max_participants }} participants</div>
+                    {% elif tournament.type == 'team' and tournament.get('team_count') %}
+                        <div class="text-xs text-gray-500">{{ tournament.team_count }} / {{ tournament.max_teams }} teams</div>
+                    {% endif %}
+                    
+                    {% if tournament.prize_pool %}
+                        <div class="text-xs text-amber-600 font-semibold">${{ tournament.prize_pool }} Prize Pool</div>
+                    {% endif %}
+                </div>
+                
+                <a href="{{ url_for('main.tournament_details', tournament_id=tournament.id) }}" class="inline-flex items-center text-green-600 hover:text-green-700 text-sm font-semibold">
+                    View Tournament <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-8">
+            <a href="{{ url_for('main.explore') }}" class="inline-flex items-center bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg">
+                <i class="fas fa-search mr-2"></i>Explore All Tournaments
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Tournament Preview Section -->
+<section class="py-16 bg-gradient-to-br from-blue-50 to-green-50" aria-labelledby="preview-heading">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 scroll-reveal">
+            <h2 id="preview-heading" class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">See What You Get</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Your tournaments will look professional and work perfectly on all devices</p>
+        </div>
+        
+        <!-- Mock Tournament Display -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl mx-auto scroll-reveal">
+            <!-- Mock Tournament Header -->
+            <div class="bg-gradient-to-r from-green-600 to-blue-600 p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold mb-1">Summer Football Cup 2024</h3>
+                        <p class="text-green-100 text-sm">Solo Tournament • 16 Players • Live</p>
+                    </div>
+                    <div class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                        <i class="fas fa-circle text-green-300 mr-1 animate-pulse"></i>Live
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mock Bracket Preview -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Mock Matches -->
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Current Matches</h4>
+                        <div class="space-y-3">
+                            <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">A</div>
+                                    <span class="font-medium">Alex_Pro</span>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-lg font-bold text-gray-900">2 - 1</div>
+                                    <div class="text-xs text-gray-500">Final</div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="font-medium">Mike_FC</span>
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">M</div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">S</div>
+                                    <span class="font-medium">Sarah_11</span>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-sm text-gray-500">vs</div>
+                                    <div class="text-xs text-gray-400">Semi-Final</div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="font-medium">Tom_Goals</span>
+                                    <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs font-bold">T</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mock Leaderboard -->
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-4">Live Standings</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                    <span class="font-medium">Alex_Pro</span>
+                                </div>
+                                <div class="text-sm text-gray-600">3 Wins</div>
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                    <span class="font-medium">Mike_FC</span>
+                                </div>
+                                <div class="text-sm text-gray-600">2 Wins</div>
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <span class="w-6 h-6 bg-orange-300 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                    <span class="font-medium">Sarah_11</span>
+                                </div>
+                                <div class="text-sm text-gray-600">2 Wins</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center text-green-700">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span class="text-sm font-medium">Updates automatically as you enter scores</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview Features -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 scroll-reveal">
+            <div class="text-center bg-white p-4 rounded-xl shadow-sm">
+                <i class="fas fa-mobile-alt text-2xl text-blue-600 mb-2"></i>
+                <p class="text-sm font-medium text-gray-700">Mobile Ready</p>
+            </div>
+            <div class="text-center bg-white p-4 rounded-xl shadow-sm">
+                <i class="fas fa-link text-2xl text-green-600 mb-2"></i>
+                <p class="text-sm font-medium text-gray-700">Shareable Links</p>
+            </div>
+            <div class="text-center bg-white p-4 rounded-xl shadow-sm">
+                <i class="fas fa-bolt text-2xl text-yellow-600 mb-2"></i>
+                <p class="text-sm font-medium text-gray-700">Real-time</p>
+            </div>
+            <div class="text-center bg-white p-4 rounded-xl shadow-sm">
+                <i class="fas fa-eye text-2xl text-purple-600 mb-2"></i>
+                <p class="text-sm font-medium text-gray-700">Public/Private</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Features Section -->
+<section class="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+    <!-- Background decorations -->
+    <div class="absolute top-10 right-10 w-32 h-32 bg-green-100 rounded-full opacity-50 animate-pulse"></div>
+    <div class="absolute bottom-10 left-10 w-24 h-24 bg-blue-100 rounded-full opacity-50 animate-pulse" style="animation-delay: 1s;"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-16 scroll-reveal">
+            <div class="inline-flex items-center bg-gradient-to-r from-green-50 to-blue-50 text-green-700 px-4 py-2 rounded-full text-sm font-semibold mb-4 border border-green-200">
+                <i class="fas fa-sparkles mr-2 text-green-500"></i>
+                Why 12,000+ Organizers Choose Us
+            </div>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6 leading-tight">
+                <span class="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                    Everything You Need
+                </span><br>
+                <span class="text-gray-700">Nothing You Don't</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Built specifically for football tournaments. No bloat, no confusion. Just the features that matter.
+            </p>
+        </div>
+        
+        <!-- Main Features Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 scroll-reveal">
+            <!-- Feature 1 - Auto Brackets -->
+            <div class="feature-card group p-8 rounded-3xl shadow-lg relative">
+                <div class="relative z-10">
+                    <div class="bg-gradient-to-br from-green-100 to-green-200 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 mx-auto">
+                        <i class="fas fa-magic text-3xl icon-gradient group-hover:animate-bounce" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 mb-4 text-center gradient-text">
+                        Smart Auto Brackets
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed text-center mb-6">
+                        Add players, pick format, done! Our AI creates perfect brackets automatically. No manual work needed.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Single & Double Elimination</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Round Robin & Groups</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-green-500 mr-2"></i>
+                            <span>Smart Seeding</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 2 - Live Updates -->
+            <div class="feature-card group p-8 rounded-3xl shadow-lg relative lg:scale-105">
+                <div class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-black px-3 py-1 rounded-full transform rotate-12">
+                    POPULAR
+                </div>
+                <div class="relative z-10">
+                    <div class="bg-gradient-to-br from-blue-100 to-blue-200 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 mx-auto">
+                        <i class="fas fa-bolt text-3xl text-blue-600 group-hover:animate-pulse" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 mb-4 text-center text-blue-600">
+                        Real-Time Everything
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed text-center mb-6">
+                        Enter a score, everyone sees it instantly. Live standings, notifications, and bracket updates.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-blue-500 mr-2"></i>
+                            <span>WebSocket Live Updates</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-blue-500 mr-2"></i>
+                            <span>Auto Notifications</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-blue-500 mr-2"></i>
+                            <span>Live Commentary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 3 - Easy Sharing -->
+            <div class="feature-card group p-8 rounded-3xl shadow-lg relative">
+                <div class="relative z-10">
+                    <div class="bg-gradient-to-br from-purple-100 to-purple-200 w-20 h-20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 mx-auto">
+                        <i class="fas fa-share-alt text-3xl text-purple-600 group-hover:animate-spin" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 mb-4 text-center text-purple-600">
+                        One-Click Sharing
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed text-center mb-6">
+                        Share one link, players join instantly. Works on phones, tablets, computers. That's it!
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-purple-500 mr-2"></i>
+                            <span>Universal Links</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-purple-500 mr-2"></i>
+                            <span>QR Code Generation</span>
+                        </div>
+                        <div class="flex items-center justify-center text-sm text-gray-500">
+                            <i class="fas fa-check text-purple-500 mr-2"></i>
+                            <span>Social Media Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Benefits Banner -->
+        <div class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-green-400/10 to-blue-400/10"></div>
+            <div class="relative z-10">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-black mb-2">The Complete Package</h3>
+                    <p class="text-gray-300">Everything works together seamlessly</p>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center group">
+                        <div class="bg-green-500 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-mobile-alt text-white text-lg"></i>
+                        </div>
+                        <div class="font-bold text-sm mb-1">Mobile First</div>
+                        <div class="text-xs text-gray-400">Perfect on phones</div>
+                    </div>
+                    <div class="text-center group">
+                        <div class="bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-download text-white text-lg"></i>
+                        </div>
+                        <div class="font-bold text-sm mb-1">No Download</div>
+                        <div class="text-xs text-gray-400">Works in browser</div>
+                    </div>
+                    <div class="text-center group">
+                        <div class="bg-purple-500 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-heart text-white text-lg"></i>
+                        </div>
+                        <div class="font-bold text-sm mb-1">Always Free</div>
+                        <div class="text-xs text-gray-400">No hidden costs</div>
+                    </div>
+                    <div class="text-center group">
+                        <div class="bg-orange-500 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-globe text-white text-lg"></i>
+                        </div>
+                        <div class="font-bold text-sm mb-1">Works Anywhere</div>
+                        <div class="text-xs text-gray-400">Any device, any OS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Solo vs Team Selector (Simplified) -->
+<section class="py-16 bg-white" aria-labelledby="tournament-types-heading">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8 scroll-reveal">
+            <h2 id="tournament-types-heading" class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Choose Your Tournament</h2>
+            <p class="text-gray-600">Pick Solo (1v1) or Team (Co‑op). You can change settings later.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Solo -->
+            <div class="feature-card p-8 rounded-2xl scroll-reveal" role="region" aria-label="Solo (1v1) tournament">
+                <div class="flex items-center mb-6">
+                    <div class="bg-gradient-to-br from-green-100 to-green-200 w-16 h-16 rounded-2xl flex items-center justify-center mr-4">
+                        <i class="fas fa-user text-2xl icon-gradient" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold gradient-text">Solo (1v1)</h3>
+                        <p class="text-gray-600 text-sm">Player vs player. Simple and fast.</p>
+                    </div>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-2 mb-6">
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3" aria-hidden="true"></i>Best‑of (BO1/BO3)</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3" aria-hidden="true"></i>Auto seeding</li>
+                    <li class="flex items-center"><i class="fas fa-check text-green-500 mr-3" aria-hidden="true"></i>Quick brackets</li>
+                </ul>
+                <a href="{{ url_for('tournament.create') }}?mode=solo" class="inline-flex items-center bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-green-300 transform hover:-translate-y-1 hover:shadow-lg" aria-label="Create a solo tournament">
+                    <i class="fas fa-plus mr-2" aria-hidden="true"></i>Create Solo Tournament
+                </a>
+            </div>
+            <!-- Team -->
+            <div class="feature-card p-8 rounded-2xl scroll-reveal" style="transition-delay: 0.2s;" role="region" aria-label="Team (Co‑op) tournament">
+                <div class="flex items-center mb-6">
+                    <div class="bg-gradient-to-br from-purple-100 to-purple-200 w-16 h-16 rounded-2xl flex items-center justify-center mr-4">
+                        <i class="fas fa-users text-2xl text-purple-600" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-purple-600">Team (Co‑op)</h3>
+                        <p class="text-gray-600 text-sm">Squads and clubs with subs.</p>
+                    </div>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-2 mb-6">
+                    <li class="flex items-center"><i class="fas fa-check text-purple-500 mr-3" aria-hidden="true"></i>Rosters & subs</li>
+                    <li class="flex items-center"><i class="fas fa-check text-purple-500 mr-3" aria-hidden="true"></i>Groups → Knockouts</li>
+                    <li class="flex items-center"><i class="fas fa-check text-purple-500 mr-3" aria-hidden="true"></i>Discipline tracking</li>
+                </ul>
+                <a href="{{ url_for('tournament.create') }}?mode=team" class="inline-flex items-center bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-300 transform hover:-translate-y-1 hover:shadow-lg" aria-label="Create a team tournament">
+                    <i class="fas fa-plus mr-2" aria-hidden="true"></i>Create Team Tournament
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Quick Questions?</h2>
+            <p class="text-gray-600">Everything you need to know about getting started</p>
+        </div>
+        
+        <div class="space-y-4">
+            <!-- FAQ Item 1 -->
+            <details class="group bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-colors cursor-pointer">
+                <summary class="flex items-center justify-between font-semibold text-gray-900 cursor-pointer list-none">
+                    <span class="flex items-center">
+                        <i class="fas fa-question-circle text-green-600 mr-3"></i>
+                        Is it really free forever?
+                    </span>
+                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-gray-500"></i>
+                </summary>
+                <div class="mt-4 text-gray-600 leading-relaxed">
+                    Yes! Create unlimited tournaments with up to 64 players each. No hidden fees, no credit card required. We believe tournament organization should be accessible to everyone.
+                </div>
+            </details>
+            
+            <!-- FAQ Item 2 -->
+            <details class="group bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-colors cursor-pointer">
+                <summary class="flex items-center justify-between font-semibold text-gray-900 cursor-pointer list-none">
+                    <span class="flex items-center">
+                        <i class="fas fa-mobile-alt text-blue-600 mr-3"></i>
+                        Do I need to download anything?
+                    </span>
+                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-gray-500"></i>
+                </summary>
+                <div class="mt-4 text-gray-600 leading-relaxed">
+                    Nope! Everything works in your web browser on any device. Players can join from their phones, tablets, or computers. No apps to install or update.
+                </div>
+            </details>
+            
+            <!-- FAQ Item 3 -->
+            <details class="group bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-colors cursor-pointer">
+                <summary class="flex items-center justify-between font-semibold text-gray-900 cursor-pointer list-none">
+                    <span class="flex items-center">
+                        <i class="fas fa-clock text-purple-600 mr-3"></i>
+                        How long does setup really take?
+                    </span>
+                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-gray-500"></i>
+                </summary>
+                <div class="mt-4 text-gray-600 leading-relaxed">
+                    Most organizers are sharing their tournament link within 2-3 minutes. Just pick Solo or Team format, add a name and rules, then share. Brackets generate automatically when players join.
+                </div>
+            </details>
+            
+            <!-- FAQ Item 4 -->
+            <details class="group bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-colors cursor-pointer">
+                <summary class="flex items-center justify-between font-semibold text-gray-900 cursor-pointer list-none">
+                    <span class="flex items-center">
+                        <i class="fas fa-users text-orange-600 mr-3"></i>
+                        Can I run different tournament formats?
+                    </span>
+                    <i class="fas fa-chevron-down group-open:rotate-180 transition-transform text-gray-500"></i>
+                </summary>
+                <div class="mt-4 text-gray-600 leading-relaxed">
+                    Absolutely! We support Single Elimination, Double Elimination, Round Robin, and Group Stage formats. Perfect for quick knockout tournaments or longer league-style competitions.
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Testimonials -->
+<section class="py-16 bg-gradient-to-br from-gray-50 to-green-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-2xl font-bold gradient-text mb-12">Trusted by Tournament Organizers</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% if testimonials %}
+                {% for testimonial in testimonials %}
+                <div class="feature-card p-8 rounded-2xl">
+                    <div class="text-amber-500 mb-4 text-2xl">{% for i in range(testimonial.rating) %}★{% endfor %}</div>
+                    <p class="text-gray-700 text-base mb-4 font-medium leading-relaxed">"{{ testimonial.comment }}"</p>
+                    <div class="flex items-center justify-center">
+                        <div class="w-10 h-10 bg-gradient-to-br {{ testimonial.avatar_color }} rounded-full flex items-center justify-center text-white font-bold mr-3">{{ testimonial.initial }}</div>
+                        <div class="text-left">
+                            <p class="text-gray-900 font-semibold">{{ testimonial.name }}</p>
+                            <p class="text-gray-500 text-sm">{{ testimonial.title }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback static testimonials if no data -->
+                <div class="feature-card p-8 rounded-2xl">
+                    <div class="text-amber-500 mb-4 text-2xl">★★★★★</div>
+                    <p class="text-gray-700 text-base mb-4 font-medium leading-relaxed">"Setup took 2 minutes. Players loved the live updates!"</p>
+                    <div class="flex items-center justify-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold mr-3">A</div>
+                        <div class="text-left">
+                            <p class="text-gray-900 font-semibold">Alex</p>
+                            <p class="text-gray-500 text-sm">Local Football League</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-16 bg-gradient-tournament relative">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">
+            Start Your Football Tournament Today
+        </h2>
+        <p class="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+            Join thousands of organizers. <strong>Free forever.</strong> No setup fees.
+        </p>
+        {% if not session.user_id %}
+            <a href="{{ url_for('auth.register') }}" class="inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-yellow-300" aria-label="Create free account and start tournament">
+                <i class="fas fa-rocket mr-3" aria-hidden="true"></i>Create Free Account
+            </a>
+            <p class="text-white/70 text-sm mt-3">No credit card required</p>
+        {% else %}
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="{{ url_for('tournament.create') }}?mode=solo" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl text-lg font-bold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-yellow-300" aria-label="Create solo tournament">
+                    <i class="fas fa-user mr-2" aria-hidden="true"></i>Create Solo Tournament
+                </a>
+                <span class="text-white/70 text-sm font-medium">OR</span>
+                <a href="{{ url_for('tournament.create') }}?mode=team" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white px-6 py-3 rounded-xl text-lg font-bold transition-all duration-300 shadow-lg border border-white/20 focus:outline-none focus:ring-4 focus:ring-white/50" aria-label="Create team tournament">
+                    <i class="fas fa-users mr-2" aria-hidden="true"></i>Create Team Tournament
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Real Platform Statistics -->
+<section class="py-12 bg-white border-t border-gray-100">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+                <div class="text-2xl font-bold text-green-600 mb-1">{{ '{:,}'.format(platform_stats.total_tournaments) }}+</div>
+                <div class="text-sm text-gray-600">Tournaments</div>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-blue-600 mb-1">{{ '{:,}'.format(platform_stats.total_participants) }}+</div>
+                <div class="text-sm text-gray-600">Happy Players</div>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-purple-600 mb-1">{{ platform_stats.avg_setup_time }} Min</div>
+                <div class="text-sm text-gray-600">Avg Setup Time</div>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-orange-600 mb-1">{{ '{:.1f}'.format(platform_stats.success_rate) }}%</div>
+                <div class="text-sm text-gray-600">Success Rate</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

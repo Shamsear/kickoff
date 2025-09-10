@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Participants - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .floating-shape {
+        position: absolute;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+    }
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-10px)} }
+    .participant-card { 
+        background: linear-gradient(135deg,#fff 0%,#f8fafc 100%); 
+        border: 1px solid rgba(16,185,129,.1); 
+        transition: all .3s ease; 
+    }
+    .participant-card:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 20px 40px rgba(16,185,129,.08); 
+        border-color: rgba(16,185,129,.2); 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Header -->
+    <div class="hero-gradient border-b border-green-100">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2">
+                    <li><a href="{{ url_for('main.index') }}" class="hover:text-gray-900"><i class="fas fa-home"></i></a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-gray-900">{{ tournament.name }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li class="text-gray-900 font-semibold">Participants</li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black text-gray-900">Tournament Participants</h1>
+                        <p class="text-gray-700">Individual players registered for <span class="font-semibold text-green-600">{{ tournament.name }}</span></p>
+                    </div>
+                </div>
+                
+                {% if is_organizer %}
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('tournament.add_participant', tournament_id=tournament.id) }}" 
+                            class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                        <i class="fas fa-user-plus mr-2"></i>Add Player
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-green-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ participants|length }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">Registered</div>
+                        </div>
+                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-yellow-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ (tournament.max_participants or 32) - participants|length }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">Spots Left</div>
+                        </div>
+                        <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ matches_played or 0 }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">Matches Played</div>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-indigo-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ tournament.status|title }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">Status</div>
+                        </div>
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% if participants %}
+        <!-- Participants Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {% for participant in participants %}
+            <div class="participant-card rounded-2xl overflow-hidden shadow-lg">
+                <!-- Player Header -->
+                <div class="px-6 py-4 bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-sm">
+                                <span class="text-white font-bold text-lg">{{ participant.name[:2]|upper }}</span>
+                            </div>
+                            <div>
+                                <div class="text-base font-black text-gray-900">{{ participant.name }}</div>
+                                <div class="text-sm text-gray-600">
+                                    {% if participant.gamer_tag %}<i class="fas fa-gamepad mr-1"></i>{{ participant.gamer_tag }}{% else %}Player{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        {% if participant.is_approved %}
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                            <i class="fas fa-check mr-1.5"></i>
+                            Approved
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-clock mr-1.5"></i>
+                            Pending
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Player Info -->
+                <div class="p-6">
+                    <!-- Contact Info -->
+                    <div class="space-y-3 mb-5">
+                        {% if participant.email %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-envelope text-green-500 mr-3 w-4"></i>
+                            <span class="truncate font-medium">{{ participant.email }}</span>
+                        </div>
+                        {% endif %}
+                        {% if participant.phone %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-phone text-blue-500 mr-3 w-4"></i>
+                            <span class="font-medium">{{ participant.phone }}</span>
+                        </div>
+                        {% endif %}
+                        {% if participant.platform %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-gamepad text-indigo-500 mr-3 w-4"></i>
+                            <span class="font-medium">{{ participant.platform }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Stats -->
+                    {% if participant.stats %}
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 mb-5 border border-gray-200">
+                        <h4 class="text-sm font-black text-gray-900 mb-3 flex items-center">
+                            <i class="fas fa-chart-bar text-green-500 mr-2"></i>
+                            Tournament Stats
+                        </h4>
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div>
+                                <div class="text-xl font-black text-green-600">{{ participant.stats.wins or 0 }}</div>
+                                <div class="text-xs text-gray-600 font-semibold">Wins</div>
+                            </div>
+                            <div>
+                                <div class="text-xl font-black text-red-500">{{ participant.stats.losses or 0 }}</div>
+                                <div class="text-xs text-gray-600 font-semibold">Losses</div>
+                            </div>
+                            <div>
+                                <div class="text-xl font-black text-blue-600">{{ participant.stats.matches_played or 0 }}</div>
+                                <div class="text-xs text-gray-600 font-semibold">Played</div>
+                            </div>
+                        </div>
+                        {% if participant.stats.win_rate %}
+                        <div class="mt-4 pt-3 border-t border-gray-300">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-600 font-semibold">Win Rate</span>
+                                <span class="text-sm font-black text-green-600">{{ participant.stats.win_rate }}%</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Registration Date -->
+                    <div class="flex items-center justify-between text-xs text-gray-500 mb-5">
+                        <span class="flex items-center font-semibold">
+                            <i class="fas fa-calendar text-gray-400 mr-1.5"></i>
+                            {{ participant.created_at[:10] if participant.created_at else 'Recent' }}
+                        </span>
+                        <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-bold">#{{ loop.index }}</span>
+                    </div>
+                    
+                    <!-- Actions -->
+                    {% if is_organizer %}
+                    <div class="flex items-center justify-between pt-4 border-t border-green-100">
+                        <div class="flex space-x-2">
+                            {% if not participant.is_approved %}
+                            <button onclick="approvePlayer('{{ participant.id }}')" 
+                                    class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-xs font-bold rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                                <i class="fas fa-check mr-1.5"></i>
+                                Approve
+                            </button>
+                            {% endif %}
+                            <button onclick="editPlayer('{{ participant.id }}')" 
+                                    class="inline-flex items-center px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold rounded-lg transition-colors border border-blue-200">
+                                <i class="fas fa-edit mr-1.5"></i>
+                                Edit
+                            </button>
+                        </div>
+                        <button onclick="removePlayer('{{ participant.id }}')" 
+                                class="inline-flex items-center px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 text-xs font-bold rounded-lg transition-colors border border-red-200">
+                            <i class="fas fa-trash mr-1.5"></i>
+                            Remove
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <!-- Enhanced Empty State -->
+        <div class="text-center py-16">
+            <div class="max-w-md mx-auto">
+                <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <i class="fas fa-user-plus text-green-600 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-black text-gray-900 mb-3">No Players Registered Yet</h3>
+                <p class="text-gray-600 mb-8 leading-relaxed">Individual players will appear here once they register for the solo tournament. You can also manually add players as the organizer.</p>
+                
+                {% if is_organizer %}
+                <a href="{{ url_for('tournament.add_participant', tournament_id=tournament.id) }}" 
+                        class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                    <i class="fas fa-user-plus mr-2"></i>Add First Player
+                </a>
+                <p class="text-xs text-gray-500 mt-3">You can add participants manually or wait for registrations</p>
+                {% else %}
+                <div class="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                    <i class="fas fa-info-circle text-gray-400 mr-2"></i>
+                    Only the tournament organizer can add participants
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+
+// Player Actions
+function approvePlayer(participantId) {
+    // Enhanced confirmation dialog
+    if (confirm('✓ Approve this player for the tournament?')) {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i>Approving...';
+        
+        fetch(`{{ url_for('tournament.approve_participant', tournament_id=tournament.id, participant_id='PLACEHOLDER') }}`.replace('PLACEHOLDER', participantId), {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('❌ Error: ' + (data.error || 'Failed to approve player'));
+            }
+        })
+        .catch(error => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            alert('❌ Error approving player: ' + error.message);
+        });
+    }
+}
+
+function editPlayer(participantId) {
+    // Redirect to edit page or open edit modal
+    window.location.href = `{{ url_for('tournament.edit_participant', tournament_id=tournament.id, participant_id='PLACEHOLDER') }}`.replace('PLACEHOLDER', participantId);
+}
+
+function removePlayer(participantId) {
+    // Enhanced confirmation dialog
+    if (confirm('⚠️ Remove this player from the tournament?\n\nThis action cannot be undone and will remove them from all matches.')) {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i>Removing...';
+        
+        fetch(`{{ url_for('tournament.remove_participant', tournament_id=tournament.id, participant_id='PLACEHOLDER') }}`.replace('PLACEHOLDER', participantId), {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('❌ Error: ' + (data.error || 'Failed to remove player'));
+            }
+        })
+        .catch(error => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            alert('❌ Error removing player: ' + error.message);
+        });
+    }
+}
+
+</script>
+{% endblock %}

@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Add Participant - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .floating-shape {
+        position: absolute;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+    }
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-10px)} }
+    .form-card {
+        background: linear-gradient(135deg,#fff 0%,#f8fafc 100%);
+        border: 1px solid rgba(16,185,129,.1);
+        transition: all .3s ease;
+    }
+    .form-card:hover {
+        box-shadow: 0 20px 40px rgba(16,185,129,.08);
+        border-color: rgba(16,185,129,.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Header -->
+    <div class="hero-gradient border-b border-green-100">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2">
+                    <li><a href="{{ url_for('main.index') }}" class="hover:text-gray-900"><i class="fas fa-home"></i></a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-gray-900">{{ tournament.name }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.participants', tournament_id=tournament.id) }}" class="hover:text-gray-900">Participants</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li class="text-gray-900 font-semibold">Add New Participant</li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-user-plus text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black text-gray-900">Add New Participant</h1>
+                        <p class="text-gray-700">Register a new player for <span class="font-semibold text-green-600">{{ tournament.name }}</span></p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <!-- Tournament Info -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-green-100">
+                        <div class="text-xs text-gray-600 font-semibold">Solo Tournament</div>
+                        <div class="text-sm font-black text-green-600">1v1 Football</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="form-card rounded-2xl shadow-lg">
+            <div class="px-8 py-6 bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-black text-gray-900 flex items-center">
+                            <i class="fas fa-user-plus text-green-600 mr-3"></i>
+                            Player Registration Form
+                        </h2>
+                        <p class="text-green-700 mt-1">Fill in the player's information to add them to the tournament</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                            <i class="fas fa-users mr-1"></i>
+                            {{ participants_count or 0 }} / {{ tournament.max_participants or 32 }} Registered
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="addParticipantForm" class="p-8 space-y-8">
+                <!-- Personal Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-user text-green-500 mr-2"></i>
+                        Personal Details
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">
+                                Player Name *
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="name" required
+                                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                   placeholder="Enter full name">
+                            <p class="text-xs text-gray-500 mt-1">The player's full real name</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Gamer Tag</label>
+                            <div class="relative">
+                                <i class="fas fa-gamepad absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="text" name="gamer_tag"
+                                       class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                       placeholder="Football username">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Their in-game username or PSN/Xbox gamertag</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-address-book text-blue-500 mr-2"></i>
+                        Contact Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+                            <div class="relative">
+                                <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="email" name="email"
+                                       class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                       placeholder="player@email.com">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">For tournament updates and notifications</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="tel" name="phone"
+                                       class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                       placeholder="+1234567890">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Optional contact number</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gaming Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-gamepad text-indigo-500 mr-2"></i>
+                        Gaming Platform
+                    </h3>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Gaming Platform</label>
+                        <select name="platform"
+                                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+                            <option value="">Select gaming platform</option>
+                            <option value="PlayStation">PlayStation (PS4/PS5)</option>
+                            <option value="Xbox">Xbox (One/Series X|S)</option>
+                            <option value="PC (Steam)">PC (Steam)</option>
+                            <option value="PC (Epic)">PC (Epic Games Store)</option>
+                            <option value="Mobile">Mobile (iOS/Android)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">The platform they'll be playing on</p>
+                    </div>
+                </div>
+
+                <!-- Tournament Settings -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-cog text-purple-500 mr-2"></i>
+                        Tournament Settings
+                    </h3>
+                    
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-green-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-gray-700">Approval Status</div>
+                                    <div class="text-sm text-gray-600">Auto-approve this participant for the tournament</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_approved" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span class="ml-3 text-sm font-bold text-gray-700">Auto-approve</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                            <p class="text-sm text-green-700">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                The participant will be automatically approved and can participate in matches immediately.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-8 border-t-2 border-green-100">
+                    <a href="{{ url_for('tournament.participants', tournament_id=tournament.id) }}" 
+                       class="inline-flex items-center px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Participants
+                    </a>
+                    
+                    <div class="flex space-x-4">
+                        <button type="button" onclick="clearForm()" 
+                                class="inline-flex items-center px-5 py-3 bg-gray-50 text-gray-700 hover:bg-gray-100 text-sm font-bold rounded-lg transition-colors border border-gray-200">
+                            <i class="fas fa-eraser mr-2"></i>
+                            Clear Form
+                        </button>
+                        
+                        <button type="submit" 
+                                class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Add Participant
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form submission with loading states
+document.getElementById('addParticipantForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Validate required fields
+    const nameField = this.querySelector('input[name="name"]');
+    if (!nameField.value.trim()) {
+        nameField.focus();
+        nameField.classList.add('border-red-500');
+        setTimeout(() => nameField.classList.remove('border-red-500'), 3000);
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding Participant...';
+    
+    const formData = new FormData(this);
+    
+    fetch('{{ url_for("tournament.add_participant", tournament_id=tournament.id) }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        
+        if (data.success) {
+            // Show success state briefly
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Participant Added!';
+            submitBtn.classList.remove('from-green-600', 'to-green-500');
+            submitBtn.classList.add('from-green-600', 'to-green-500');
+            
+            // Show success notification
+            showNotification('✅ Participant added successfully!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = '{{ url_for("tournament.participants", tournament_id=tournament.id) }}';
+            }, 1500);
+        } else {
+            showNotification('❌ Error: ' + (data.error || 'Failed to add participant'), 'error');
+        }
+    })
+    .catch(error => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        console.error('Error:', error);
+        showNotification('❌ Failed to add participant. Please try again.', 'error');
+    });
+});
+
+// Clear form function
+function clearForm() {
+    if (confirm('🗑️ Clear all form data?')) {
+        document.getElementById('addParticipantForm').reset();
+        // Re-check the auto-approve checkbox
+        document.querySelector('input[name="is_approved"]').checked = true;
+        showNotification('📝 Form cleared successfully', 'info');
+    }
+}
+
+// Notification system
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+    
+    notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
+    notification.innerHTML = message;
+    
+    document.body.appendChild(notification);
+    
+    // Slide in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Slide out and remove
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Enhanced form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input, select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('border-red-300', 'bg-red-50');
+            } else {
+                this.classList.remove('border-red-300', 'bg-red-50');
+            }
+        });
+        
+        input.addEventListener('input', function() {
+            this.classList.remove('border-red-300', 'bg-red-50');
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kickoff Arena - Professional Tournament Management{% endblock %}</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="/static/images/logow.png">
+    <link rel="apple-touch-icon" href="/static/images/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kickoff Arena">
+    
+    <!-- PWA Theme Colors -->
+    <meta name="theme-color" content="#10b981">
+    <meta name="msapplication-TileColor" content="#10b981">
+    
+    <!-- Mobile CSS -->
+    <link rel="stylesheet" href="/static/css/mobile.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#1a2332',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#4CAF50',
+                            600: '#22c55e',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Reset default browser spacing */
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .bg-gradient-tournament {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 20%, #2E7D32 80%, #1a2332 100%);
+            position: relative;
+        }
+        
+/* Modern Light Navbar */
+        #site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-bottom: 1px solid rgba(2, 6, 23, 0.06);
+            box-shadow: 0 4px 24px rgba(2, 6, 23, 0.06);
+        }
+        
+        #site-nav.nav-scrolled {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+            backdrop-filter: saturate(180%) blur(14px);
+            border-bottom: 1px solid rgba(2, 6, 23, 0.08);
+            box-shadow: 0 8px 28px rgba(2, 6, 23, 0.08);
+        }
+        
+.nav-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.025em;
+            color: #1a2332;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-brand:hover {
+            color: #4CAF50;
+        }
+        
+.nav-item {
+            position: relative;
+            font-weight: 600;
+            color: #334155;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: transparent;
+        }
+        
+        .nav-item:hover,
+        .nav-item.active {
+            color: #1a2332;
+            background: rgba(76, 175, 80, 0.08);
+        }
+        
+.nav-cta {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+        }
+        
+        .nav-cta:hover {
+            background: linear-gradient(135deg, #388E3C 0%, #4CAF50 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(76, 175, 80, 0.25);
+        }
+        
+.mobile-menu {
+            background: #ffffff;
+            backdrop-filter: blur(14px);
+            border-top: 1px solid rgba(2, 6, 23, 0.06);
+            box-shadow: 0 -4px 24px rgba(2, 6, 23, 0.06);
+        }
+        
+        .mobile-nav-item {
+            font-weight: 600;
+            color: #334155;
+            padding: 12px 16px;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px 0;
+        }
+        
+        .mobile-nav-item:hover,
+        .mobile-nav-item.active {
+            color: #1a2332;
+            background: rgba(76, 175, 80, 0.08);
+            transform: translateX(4px);
+        }
+        
+        /* Dropdown Styles */
+        .nav-dropdown {
+            position: relative;
+        }
+        
+        /* Add invisible bridge to prevent gap issues */
+        .nav-dropdown::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 12px;
+            background: transparent;
+            z-index: 999;
+        }
+        
+.dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 16px 32px rgba(2, 6, 23, 0.12);
+            border: 1px solid rgba(2, 6, 23, 0.06);
+            padding: 8px;
+            margin-top: 4px;
+            min-width: 220px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-50%) translateY(-10px);
+            transition: all 0.25s ease;
+            pointer-events: none;
+        }
+        
+        .nav-dropdown:hover .dropdown-content,
+        .nav-dropdown.open .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        
+.dropdown-item {
+            display: block;
+            padding: 10px 14px;
+            color: #334155;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 2px 4px;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(76, 175, 80, 0.08);
+            color: #1a2332;
+            transform: translateX(4px);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.05);
+            margin: 0.5rem 0;
+        }
+        
+.dropdown-header {
+            padding: 6px 12px;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: #f1f5f9;
+            border-radius: 6px;
+            margin: 4px 6px;
+            border-left: 3px solid #4CAF50;
+        }
+        
+        .nav-item.has-dropdown i {
+            margin-left: 0.25rem;
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .nav-dropdown:hover .nav-item.has-dropdown i,
+        .nav-dropdown.open .nav-item.has-dropdown i {
+            transform: rotate(180deg);
+        }
+    
+        
+        .bg-gradient-tournament::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23fff' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* Mobile-first optimizations */
+        @media (max-width: 768px) {
+            .card-hover {
+                transition: all 0.2s ease;
+            }
+            
+            .card-hover:active {
+                transform: scale(0.98);
+            }
+            
+            /* Larger tap targets for mobile */
+            .btn-mobile {
+                min-height: 48px;
+                padding: 12px 24px;
+            }
+            
+            /* Better text sizing for readability */
+            .hero-text {
+                font-size: 1.75rem;
+                line-height: 1.3;
+            }
+        }
+        
+        /* Touch-friendly focus states */
+        .btn-focus:focus-visible {
+            outline: 3px solid #fbbf24;
+            outline-offset: 2px;
+        }
+        
+        /* Gradient text utilities */
+        .gradient-text {
+            background: linear-gradient(135deg, #1a2332 0%, #4CAF50 50%, #66BB6A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Smooth scrolling for mobile */
+        @media (prefers-reduced-motion: no-preference) {
+            html {
+                scroll-behavior: smooth;
+            }
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen m-0 p-0">
+    <!-- Skip Navigation -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-green-600 text-white px-4 py-2 rounded-md z-[9999] transition-all duration-200">
+        Skip to main content
+    </a>
+<!-- Modern Light Navigation -->
+    <nav id="site-nav" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 m-0">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="flex items-center" aria-label="Kickoff Arena - Home">
+                        <img src="/static/images/logow.png" alt="Kickoff Arena" class="h-10 w-auto mr-2">
+                        <span class="nav-brand text-xl font-bold">Kickoff Arena</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation with dropdowns -->
+                <div class="hidden md:flex items-center space-x-6">
+                    {% set ep = request.endpoint or '' %}
+                    
+                    <!-- Tournaments dropdown -->
+                    <div class="nav-dropdown" 
+                         x-data="{ 
+                             open: false, 
+                             timeout: null,
+                             enterDropdown() {
+                                 if (this.timeout) clearTimeout(this.timeout);
+                                 this.open = true;
+                             },
+                             leaveDropdown() {
+                                 this.timeout = setTimeout(() => {
+                                     this.open = false;
+                                 }, 300);
+                             },
+                             toggleDropdown() {
+                                 this.open = !this.open;
+                             }
+                         }" 
+                         @mouseenter="enterDropdown()" 
+                         @mouseleave="leaveDropdown()">
+                        <button @click="toggleDropdown()" class="nav-item has-dropdown {{ 'active' if ep.startswith('main.explore') else '' }}">
+                            Tournaments <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" 
+                             x-show="open" 
+                             x-transition
+                             @mouseenter="enterDropdown()" 
+                             @mouseleave="leaveDropdown()">
+                            <a href="{{ url_for('main.explore') }}" class="dropdown-item">Browse Tournaments</a>
+                            <a href="{{ url_for('tournament.create') }}" class="dropdown-item">Create Tournament</a>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-header">Registration</div>
+                            <a href="{{ url_for('main.features') }}#registration" class="dropdown-item">How to Register</a>
+                            <a href="{{ url_for('main.explore') }}" class="dropdown-item">Check Registration Status</a>
+                        </div>
+                    </div>
+                    
+                    <!-- About dropdown -->
+                    <div class="nav-dropdown" 
+                         x-data="{ 
+                             open: false, 
+                             timeout: null,
+                             enterDropdown() {
+                                 if (this.timeout) clearTimeout(this.timeout);
+                                 this.open = true;
+                             },
+                             leaveDropdown() {
+                                 this.timeout = setTimeout(() => {
+                                     this.open = false;
+                                 }, 300);
+                             },
+                             toggleDropdown() {
+                                 this.open = !this.open;
+                             }
+                         }" 
+                         @mouseenter="enterDropdown()" 
+                         @mouseleave="leaveDropdown()">
+                        <button @click="toggleDropdown()" class="nav-item has-dropdown {{ 'active' if ep.startswith('main.about') or ep.startswith('main.features') else '' }}">
+                            Info <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content" 
+                             x-show="open" 
+                             x-transition
+                             @mouseenter="enterDropdown()" 
+                             @mouseleave="leaveDropdown()">
+                            <a href="{{ url_for('main.features') }}" class="dropdown-item">Features</a>
+                            <a href="{{ url_for('main.registration_guide') }}" class="dropdown-item">
+                                <i class="fas fa-clipboard-list mr-2 text-blue-500"></i>How to Register
+                            </a>
+                            <a href="{{ url_for('main.registration_lookup') }}" class="dropdown-item">
+                                <i class="fas fa-search mr-2 text-green-500"></i>Check Registration
+                            </a>
+                            <hr class="my-2 border-gray-200">
+                            <a href="{{ url_for('main.about') }}" class="dropdown-item">About</a>
+                            <a href="{{ url_for('main.contact') if url_for else '#' }}" class="dropdown-item">Contact</a>
+                        </div>
+                    </div>
+                    
+                    {% if session.user_id %}
+                        <!-- User specific quick actions -->
+                        <a href="{{ url_for('main.dashboard') }}" class="nav-item {{ 'active' if ep.startswith('main.dashboard') else '' }}">Dashboard</a>
+                        <a href="{{ url_for('tournament.create') }}" class="nav-cta">Create</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="nav-item">Sign In</a>
+                        <a href="{{ url_for('auth.register') }}" class="nav-cta">Get Started</a>
+                    {% endif %}
+                </div>
+                
+                <!-- User Menu for logged-in users -->
+                {% if session.user_id %}
+                    <div class="hidden md:flex items-center ml-4">
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors" aria-label="User menu">
+                                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                    <span class="text-sm font-semibold text-gray-700">{{ session.user_name[0].upper() }}</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': open }"></i>
+                            </button>
+                            
+                            <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-1 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-1 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                                <div class="px-4 py-2 border-b border-gray-100">
+                                    <p class="text-sm font-medium text-gray-900">{{ session.user_name }}</p>
+                                    <p class="text-xs text-gray-500">Tournament Organizer</p>
+                                </div>
+                                <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profile</a>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Sign Out</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button x-data="{ open: false }" @click="open = !open; $dispatch('toggle-mobile-menu')" class="p-2" aria-label="Toggle mobile menu">
+                        <div class="w-6 h-6 relative flex flex-col justify-center">
+                            <span class="block w-6 h-0.5 bg-gray-600 rounded transform transition-all duration-200" :class="open ? 'rotate-45 translate-y-0.5' : '-translate-y-1'"></span>
+                            <span class="block w-6 h-0.5 bg-gray-600 rounded transform transition-all duration-200" :class="open ? 'opacity-0' : 'opacity-100'"></span>
+                            <span class="block w-6 h-0.5 bg-gray-600 rounded transform transition-all duration-200" :class="open ? '-rotate-45 -translate-y-0.5' : 'translate-y-1'"></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div x-data="{ mobileMenuOpen: false }" @toggle-mobile-menu.window="mobileMenuOpen = !mobileMenuOpen" 
+             x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-1" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-1" x-transition:leave-end="opacity-0" class="md:hidden mobile-menu">
+            <div class="px-6 py-4 space-y-1">
+                {% if session.user_id %}
+                    {% set ep = request.endpoint or '' %}
+                    <div class="mb-4 pb-4 border-b border-gray-100">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-semibold text-gray-700">{{ session.user_name[0].upper() }}</span>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">{{ session.user_name }}</div>
+                                <div class="text-sm text-gray-500">Tournament Organizer</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('main.dashboard') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.dashboard') else '' }}">Dashboard</a>
+                    <a href="{{ url_for('main.explore') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.explore') else '' }}">Explore</a>
+                    <a href="{{ url_for('tournament.create') }}" class="nav-cta block text-center mt-4">Create Tournament</a>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <a href="{{ url_for('auth.profile') }}" class="mobile-nav-item block">Profile</a>
+                        <a href="{{ url_for('auth.logout') }}" class="mobile-nav-item block">Sign Out</a>
+                    </div>
+                {% else %}
+                    {% set ep = request.endpoint or '' %}
+                    <a href="{{ url_for('main.explore') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.explore') else '' }}">Tournaments</a>
+                    <a href="{{ url_for('main.features') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.features') else '' }}">Features</a>
+                    <a href="{{ url_for('main.registration_guide') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.registration_guide') else '' }}">How to Register</a>
+                    <a href="{{ url_for('main.registration_lookup') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.registration_lookup') else '' }}">Check Registration</a>
+                    <a href="{{ url_for('main.about') }}" class="mobile-nav-item block {{ 'active' if ep.startswith('main.about') else '' }}">About</a>
+                    <a href="{{ url_for('auth.login') }}" class="mobile-nav-item block">Sign In</a>
+                    <a href="{{ url_for('auth.register') }}" class="nav-cta block text-center mt-4">Get Started</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed top-20 right-4 z-50 space-y-2" id="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert-{{ category }} animate-slideIn max-w-sm p-4 rounded-lg shadow-lg border-l-4 {% if category == 'success' %}bg-green-50 border-green-400 text-green-700{% elif category == 'error' %}bg-red-50 border-red-400 text-red-700{% elif category == 'info' %}bg-blue-50 border-blue-400 text-blue-700{% else %}bg-yellow-50 border-yellow-400 text-yellow-700{% endif %}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-exclamation-circle{% elif category == 'info' %}fa-info-circle{% else %}fa-exclamation-triangle{% endif %} mr-2"></i>
+                                <span class="text-sm font-medium">{{ message }}</span>
+                            </div>
+                            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current hover:opacity-70">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Page Content -->
+    <main id="main-content" class="{% block main_class %}pt-16{% endblock %}" role="main">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Modern Light Footer -->
+    <footer class="bg-gradient-to-br from-slate-50 to-gray-100 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <img src="/static/images/logow.png" alt="Kickoff Arena" class="h-12 w-auto">
+                        <span class="text-3xl font-bold gradient-text">Kickoff Arena</span>
+                    </div>
+                    <p class="text-gray-600 text-base max-w-md leading-relaxed mb-6">
+                        The specialized platform for football tournament organizers. Create Solo (1v1) and Team (Co-op) 
+                        tournaments with smart brackets, live scoring, and real-time updates.
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-check text-green-500"></i>
+                            <span class="text-sm font-medium text-gray-600">Secure & Trusted</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-bolt text-amber-500"></i>
+                            <span class="text-sm font-medium text-gray-600">Lightning Fast</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Platform</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="{{ url_for('main.features') }}" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-magic mr-2 text-xs"></i>Tournament Creation</a></li>
+                        <li><a href="{{ url_for('main.explore') }}" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-bolt mr-2 text-xs"></i>Live Scoring</a></li>
+                        <li><a href="{{ url_for('main.features') }}#teams" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-users mr-2 text-xs"></i>Team Management</a></li>
+                        <li><a href="{{ url_for('main.features') }}#sharing" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-share-alt mr-2 text-xs"></i>Easy Sharing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-6">Support</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="{{ url_for('main.registration_guide') }}" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-clipboard-list mr-2 text-xs"></i>How to Register</a></li>
+                        <li><a href="{{ url_for('main.registration_lookup') }}" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-search mr-2 text-xs"></i>Check Registration</a></li>
+                        <li><a href="{{ url_for('main.about') }}" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-info-circle mr-2 text-xs"></i>About Us</a></li>
+                        <li><a href="{{ url_for('main.contact') }}" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-envelope mr-2 text-xs"></i>Contact</a></li>
+                        <li><a href="{{ url_for('main.features') }}#help" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-question-circle mr-2 text-xs"></i>Help Center</a></li>
+                        <li><a href="#privacy" class="text-gray-600 hover:text-green-600 transition-colors duration-200 flex items-center"><i class="fas fa-shield-alt mr-2 text-xs"></i>Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Newsletter Signup -->
+            <div class="mt-12 py-8 border-t border-gray-200">
+                <div class="max-w-md mx-auto text-center">
+                    <h4 class="text-lg font-bold text-gray-900 mb-2">Stay Updated</h4>
+                    <p class="text-gray-600 text-sm mb-4">Get notified about new features and tournament opportunities</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        <button class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-6 py-2 text-sm font-semibold rounded-r-lg transition-all duration-200">
+                            Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between">
+                <p class="text-gray-500 text-sm">© 2025 Kickoff Arena. All rights reserved. Built with ❤️ for the football community.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-green-500 transition-colors duration-200 transform hover:scale-110">
+                        <i class="fab fa-twitter text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-blue-600 transition-colors duration-200 transform hover:scale-110">
+                        <i class="fab fa-facebook text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-pink-500 transition-colors duration-200 transform hover:scale-110">
+                        <i class="fab fa-instagram text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500 transition-colors duration-200 transform hover:scale-110">
+                        <i class="fab fa-youtube text-lg"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-200 transform hover:scale-110">
+                        <i class="fab fa-discord text-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Alpine.js for interactive components -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <!-- Auto-hide flash messages and navbar scroll effect -->
+    <script>
+        // Flash messages auto-hide
+        setTimeout(function() {
+            const flashMessages = document.getElementById('flash-messages');
+            if (flashMessages) {
+                flashMessages.style.transition = 'opacity 0.5s ease';
+                flashMessages.style.opacity = '0';
+                setTimeout(() => flashMessages.remove(), 500);
+            }
+        }, 5000);
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.nav-dropdown');
+            dropdowns.forEach(dropdown => {
+                const button = dropdown.querySelector('button');
+                const content = dropdown.querySelector('.dropdown-content');
+                
+                if (!dropdown.contains(event.target)) {
+                    // Trigger Alpine.js to close the dropdown
+                    const alpineData = dropdown._x_dataStack?.[0];
+                    if (alpineData && alpineData.open) {
+                        alpineData.open = false;
+                    }
+                }
+            });
+        });
+        
+        // Navbar scroll style toggle
+        (function() {
+            const nav = document.getElementById('site-nav');
+            const toggleNav = () => {
+                const y = window.pageYOffset || document.documentElement.scrollTop;
+                if (!nav) return;
+                if (y > 8) {
+                    nav.classList.add('nav-scrolled');
+                } else {
+                    nav.classList.remove('nav-scrolled');
+                }
+            };
+            toggleNav();
+            window.addEventListener('scroll', () => {
+                window.requestAnimationFrame(toggleNav);
+            }, { passive: true });
+        })();
+    </script>
+    
+    <!-- Socket.IO Connection -->
+    {% if session.user_id %}
+    <script>
+        const socket = io();
+        let currentTournament = null;
+        
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+        
+        socket.on('connected', function(data) {
+            console.log('Server message:', data.message);
+        });
+        
+        socket.on('error', function(data) {
+            console.error('Socket error:', data.message);
+        });
+        
+        // Tournament-specific events
+        socket.on('match_score_updated', function(data) {
+            console.log('Match score updated:', data);
+            // Update UI accordingly
+            updateMatchScore(data);
+        });
+        
+        socket.on('standings_updated', function(data) {
+            console.log('Standings updated:', data);
+            // Refresh standings if on standings page
+            refreshStandings(data.tournament_id);
+        });
+        
+        socket.on('tournament_news_published', function(data) {
+            console.log('Tournament news:', data);
+            showNotification('New Update', data.title, 'info');
+        });
+        
+        // Helper functions
+        function joinTournament(tournamentId) {
+            currentTournament = tournamentId;
+            socket.emit('join_tournament', {tournament_id: tournamentId});
+        }
+        
+        function leaveTournament(tournamentId) {
+            if (currentTournament === tournamentId) {
+                socket.emit('leave_tournament', {tournament_id: tournamentId});
+                currentTournament = null;
+            }
+        }
+        
+        function updateMatchScore(data) {
+            // Update match score display if present
+            const matchElement = document.getElementById('match-' + data.match_id);
+            if (matchElement) {
+                const scoreElement = matchElement.querySelector('.match-score');
+                if (scoreElement) {
+                    scoreElement.textContent = data.team1_score + ' - ' + data.team2_score;
+                }
+            }
+        }
+        
+        function refreshStandings(tournamentId) {
+            // Refresh standings table if present
+            if (window.location.pathname.includes('standings')) {
+                location.reload();
+            }
+        }
+        
+        function showNotification(title, message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-20 right-4 z-50 max-w-sm p-4 rounded-lg shadow-lg border-l-4 animate-slideIn ${
+                type === 'success' ? 'bg-green-50 border-green-400 text-green-700' :
+                type === 'error' ? 'bg-red-50 border-red-400 text-red-700' :
+                'bg-blue-50 border-blue-400 text-blue-700'
+            }`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-medium text-sm">${title}</div>
+                        <div class="text-sm">${message}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-current hover:opacity-70">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.5s ease';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+    </script>
+    {% endif %}
+    
+    <!-- PWA Detection Script -->
+    <script src="/static/js/pwa-detection.js"></script>
+    
+    <!-- Mobile Interactions Script -->
+    <script src="/static/js/mobile.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

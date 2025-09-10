@@ -1,0 +1,1527 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Enhanced gradient backgrounds with animated patterns */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+        animation: gradientShift 8s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%); }
+        50% { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 25%, #86efac 50%, #4ade80 75%, #10b981 100%); }
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23fff' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    
+    /* Enhanced feature card styling with glassmorphism */
+    .feature-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 32px 64px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Animated stats cards */
+    .stat-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+        transition: width 0.3s ease;
+    }
+    
+    .stat-card:hover::after {
+        width: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px) rotate(1deg);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* Enhanced gradient text with animation */
+    .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 25%, #34d399 50%, #6ee7b7 75%, #10b981 100%);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientFlow 3s ease-in-out infinite;
+    }
+    
+    @keyframes gradientFlow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    /* Enhanced buttons with better interactions */
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn-primary:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 25px 50px rgba(16, 185, 129, 0.4);
+    }
+    
+    .floating-cta {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .floating-cta::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #fbbf24, #f59e0b, #10b981, #34d399);
+        border-radius: inherit;
+        z-index: -1;
+        filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        animation: rotate 4s linear infinite;
+    }
+    
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .floating-cta:hover::before {
+        opacity: 0.7;
+    }
+    
+    /* Enhanced tab styling */
+    .tab-button {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .tab-button::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #10b981, #34d399);
+        transition: width 0.3s ease;
+    }
+    
+    .tab-button:hover::before {
+        width: 100%;
+    }
+    
+    .tab-button.active::before {
+        width: 100%;
+    }
+    
+    /* Improved table styling */
+    .standings-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .standings-table tbody tr {
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .standings-table tbody tr:hover {
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+    }
+    
+    .standings-table tbody tr:hover td {
+        background-color: rgba(16, 185, 129, 0.05);
+    }
+    
+    /* Match card enhancements */
+    .match-card {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .match-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #10b981, #34d399);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .match-card:hover::before {
+        transform: scaleY(1);
+    }
+    
+    .match-card:hover {
+        transform: translateX(8px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Pulse animation for live matches */
+    .live-pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    /* Entrance animations */
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .slide-in-left {
+        animation: slideInLeft 0.5s ease-out;
+    }
+    
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .slide-in-right {
+        animation: slideInRight 0.5s ease-out;
+    }
+    
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    /* Loading states */
+    .loading-shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    /* Scroll progress bar */
+    .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, #10b981, #34d399);
+        z-index: 9999;
+        transition: width 0.1s;
+    }
+    
+    /* Enhanced status badges */
+    .status-badge {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .status-badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shine 2s infinite;
+    }
+    
+    @keyframes shine {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+    
+    /* Improved responsive design */
+    @media (max-width: 768px) {
+        .feature-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .match-card:hover {
+            transform: translateX(4px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Modern Tournament Header -->
+    <div class="hero-gradient relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Enhanced Breadcrumbs -->
+            <nav class="flex mb-8 fade-in" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <a href="{{ url_for('main.index') }}" class="text-green-600 hover:text-green-700 text-sm transition-colors group">
+                            <i class="fas fa-home group-hover:scale-110 transition-transform"></i>
+                            <span class="sr-only">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <a href="{{ url_for('main.explore') }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Explore</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <span class="text-sm font-bold text-gray-900">{{ tournament.name }}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Enhanced Tournament Title Section -->
+            <div class="feature-card bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20 slide-in-left">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between">
+                    <div class="flex items-center space-x-8 mb-6 lg:mb-0">
+                        <div class="relative group">
+                            <div class="w-24 h-24 bg-gradient-to-br from-green-500 via-green-600 to-green-700 rounded-3xl flex items-center justify-center shadow-2xl transform group-hover:scale-105 transition-all duration-300 group-hover:rotate-3">
+                                <i class="fas fa-trophy text-white text-4xl group-hover:scale-110 transition-transform"></i>
+                            </div>
+                            <div class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
+                                <i class="fas fa-star text-yellow-800 text-xs"></i>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <h1 class="text-5xl lg:text-6xl font-black gradient-text mb-3 hover:scale-105 transition-transform cursor-default">{{ tournament.name }}</h1>
+                            <div class="flex flex-wrap items-center gap-4 text-sm mb-4">
+                                <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 border border-green-200 hover:bg-white/80 transition-all">
+                                    <i class="fas fa-calendar text-green-600 mr-2 animate-pulse"></i>
+                                    <span class="font-medium text-gray-700">
+                                        {% if tournament.start_date %}
+                                            {{ tournament.start_date[:10] }}
+                                            {% if tournament.end_date %} - {{ tournament.end_date[:10] }}{% endif %}
+                                        {% else %}
+                                            Date TBD
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 border border-green-200 hover:bg-white/80 transition-all">
+                                    <i class="fas fa-gamepad text-green-600 mr-2"></i>
+                                    <span class="font-medium text-gray-700">Football {{ tournament.type|title }}</span>
+                                </div>
+                                <div class="flex items-center bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 border border-green-200 hover:bg-white/80 transition-all">
+                                    <i class="fas fa-sitemap text-green-600 mr-2"></i>
+                                    <span class="font-medium text-gray-700">{{ tournament.format|replace('_', ' ')|title }}</span>
+                                </div>
+                            </div>
+                            {% if tournament.description %}
+                            <p class="text-gray-700 text-xl leading-relaxed max-w-3xl font-medium">{{ tournament.description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col items-end space-y-4 slide-in-right">
+                        <div class="relative group">
+                            <span class="status-badge inline-flex items-center px-6 py-3 rounded-2xl text-lg font-bold shadow-lg transform group-hover:scale-105 transition-all duration-300
+                                {% if tournament.status == 'registration_open' %}bg-gradient-to-r from-green-500 to-green-600 text-white{% endif %}
+                                {% if tournament.status == 'in_progress' %}bg-gradient-to-r from-blue-500 to-blue-600 text-white live-pulse{% endif %}
+                                {% if tournament.status == 'completed' %}bg-gradient-to-r from-gray-400 to-gray-500 text-white{% endif %}
+                                {% if tournament.status == 'upcoming' %}bg-gradient-to-r from-yellow-500 to-yellow-600 text-white{% endif %}">
+                                {% if tournament.status == 'registration_open' %}
+                                    <i class="fas fa-user-plus mr-3 text-xl animate-bounce"></i>
+                                {% elif tournament.status == 'in_progress' %}
+                                    <i class="fas fa-play mr-3 text-xl"></i>
+                                {% elif tournament.status == 'completed' %}
+                                    <i class="fas fa-flag-checkered mr-3 text-xl"></i>
+                                {% else %}
+                                    <i class="fas fa-clock mr-3 text-xl"></i>
+                                {% endif %}
+                                {{ tournament.status|replace('_', ' ')|title }}
+                            </span>
+                        </div>
+                        
+                        {% if tournament.status == 'registration_open' %}
+                        <div class="text-right bg-white/70 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
+                            <div class="text-3xl font-black bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                                {% if tournament.type == 'solo' %}
+                                    {{ tournament.participant_count or 0 }}<span class="text-gray-400">/{{ tournament.max_participants or '∞' }}</span>
+                                {% else %}
+                                    {{ tournament.team_count or 0 }}<span class="text-gray-400">/{{ tournament.max_teams or '∞' }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-sm font-semibold text-gray-600 uppercase tracking-wider">{{ tournament.type|title }}{{ 's' if tournament.type == 'team' else ' Players' }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Tournament Info -->
+                <div class="feature-card rounded-2xl shadow-xl p-8 border border-green-100">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-md">
+                            <i class="fas fa-info-circle text-white text-lg"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-gray-900">Tournament Information</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Start Date</h3>
+                                <p class="mt-1 text-lg text-gray-900">
+                                    {{ tournament.start_date[:10] if tournament.start_date else 'To Be Announced' }}
+                                </p>
+                            </div>
+
+                            {% if tournament.end_date %}
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">End Date</h3>
+                                <p class="mt-1 text-lg text-gray-900">{{ tournament.end_date[:10] }}</p>
+                            </div>
+                            {% endif %}
+
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Format</h3>
+                                <p class="mt-1 text-lg text-gray-900">{{ tournament.format|replace('_', ' ')|title }}</p>
+                            </div>
+
+                            {% if tournament.entry_fee %}
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Entry Fee</h3>
+                                <p class="mt-1 text-lg text-gray-900">${{ tournament.entry_fee }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="space-y-4">
+                            {% if tournament.registration_deadline %}
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Registration Deadline</h3>
+                                <p class="mt-1 text-lg text-gray-900">{{ tournament.registration_deadline[:10] }}</p>
+                            </div>
+                            {% endif %}
+
+                            {% if tournament.prize_pool %}
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Prize Pool</h3>
+                                <p class="mt-1 text-lg text-gray-900">${{ tournament.prize_pool }}</p>
+                            </div>
+                            {% endif %}
+
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Organizer</h3>
+                                <p class="mt-1 text-lg text-gray-900">{{ tournament.organizer_name or 'Tournament Admin' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tournament Data Tabs -->
+                <div class="feature-card rounded-3xl shadow-2xl border border-white/20 fade-in" x-data="{ activeTab: 'overview' }">
+                    <!-- Enhanced Tab Navigation -->
+                    <div class="border-b border-gradient-to-r from-green-100 to-teal-100">
+                        <nav class="-mb-px flex flex-wrap gap-2 px-8 pt-8 pb-4" aria-label="Tabs">
+                            <button @click="activeTab = 'overview'" 
+                                    :class="activeTab === 'overview' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg scale-105' : 'bg-white/70 text-gray-600 hover:bg-white hover:text-green-600 hover:shadow-md'"
+                                    class="tab-button relative flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 transform hover:scale-102 backdrop-blur-sm border border-white/30">
+                                <i class="fas fa-info-circle mr-3 text-lg" :class="activeTab === 'overview' ? 'animate-pulse' : ''"></i>
+                                <span>Overview</span>
+                            </button>
+                            {% if standings and standings|length > 0 %}
+                            <button @click="activeTab = 'standings'" 
+                                    :class="activeTab === 'standings' ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-lg scale-105' : 'bg-white/70 text-gray-600 hover:bg-white hover:text-amber-600 hover:shadow-md'"
+                                    class="tab-button relative flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 transform hover:scale-102 backdrop-blur-sm border border-white/30">
+                                <i class="fas fa-trophy mr-3 text-lg" :class="activeTab === 'standings' ? 'animate-bounce' : ''"></i>
+                                <span>Standings</span>
+                                <div class="ml-2 bg-white/20 rounded-full px-2 py-1 text-xs">{{ standings|length }}</div>
+                            </button>
+                            {% endif %}
+                            {% if matches and matches|length > 0 %}
+                            <button @click="activeTab = 'fixtures'" 
+                                    :class="activeTab === 'fixtures' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-105' : 'bg-white/70 text-gray-600 hover:bg-white hover:text-blue-600 hover:shadow-md'"
+                                    class="tab-button relative flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 transform hover:scale-102 backdrop-blur-sm border border-white/30">
+                                <i class="fas fa-calendar mr-3 text-lg" :class="activeTab === 'fixtures' ? 'animate-pulse' : ''"></i>
+                                <span>{{ 'Solo Matches' if tournament.type == 'solo' else 'Team Matches' }}</span>
+                                <div class="ml-2 bg-white/20 rounded-full px-2 py-1 text-xs">{{ matches|length }}</div>
+                            </button>
+                            {% endif %}
+                            {% if stats %}
+                            <button @click="activeTab = 'statistics'" 
+                                    :class="activeTab === 'statistics' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105' : 'bg-white/70 text-gray-600 hover:bg-white hover:text-purple-600 hover:shadow-md'"
+                                    class="tab-button relative flex items-center px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 transform hover:scale-102 backdrop-blur-sm border border-white/30">
+                                <i class="fas fa-chart-bar mr-3 text-lg" :class="activeTab === 'statistics' ? 'animate-pulse' : ''"></i>
+                                <span>Statistics</span>
+                                {% if stats.total_goals %}<div class="ml-2 bg-white/20 rounded-full px-2 py-1 text-xs">{{ stats.total_goals }}</div>{% endif %}
+                            </button>
+                            {% endif %}
+                        </nav>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-8">
+                        <!-- Overview Tab -->
+                        <div x-show="activeTab === 'overview'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="display: none;" x-init="if (activeTab === 'overview') $el.style.display = 'block';">
+                            {% if tournament.description %}
+                            <div class="mb-8">
+                                <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                                    <i class="fas fa-file-text text-green-600 mr-2"></i>
+                                    Description
+                                </h3>
+                                <p class="text-gray-700 leading-relaxed">{{ tournament.description }}</p>
+                            </div>
+                            {% endif %}
+
+                            {% if tournament.rules %}
+                            <div class="mb-8">
+                                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-gavel text-purple-600 mr-2"></i>
+                                    Tournament Rules
+                                </h3>
+                                <div class="text-gray-700 whitespace-pre-wrap leading-relaxed bg-gray-50 p-4 rounded-lg">
+                                    {{ tournament.rules|safe }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if tournament_stats %}
+                            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                                {% if tournament.type == 'solo' %}
+                                <div class="stat-card group bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 rounded-2xl p-6 text-center border border-blue-200 hover:border-blue-300">
+                                    <div class="relative">
+                                        <i class="fas fa-users text-blue-600 text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                        <div class="text-3xl font-black text-blue-700 mb-1">{{ tournament_stats.total_participants }}</div>
+                                        <div class="text-sm font-semibold text-blue-600 uppercase tracking-wide">Participants</div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="stat-card group bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 rounded-2xl p-6 text-center border border-blue-200 hover:border-blue-300">
+                                    <div class="relative">
+                                        <i class="fas fa-users text-blue-600 text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                        <div class="text-3xl font-black text-blue-700 mb-1">{{ tournament_stats.total_teams }}</div>
+                                        <div class="text-sm font-semibold text-blue-600 uppercase tracking-wide">Teams</div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="stat-card group bg-gradient-to-br from-green-50 via-green-100 to-green-100 rounded-2xl p-6 text-center border border-green-200 hover:border-green-300">
+                                    <div class="relative">
+                                        <i class="fas fa-check-circle text-green-600 text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                        <div class="text-3xl font-black text-green-700 mb-1">{{ tournament_stats.completed_matches }}</div>
+                                        <div class="text-sm font-semibold text-green-600 uppercase tracking-wide">Completed</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card group bg-gradient-to-br from-yellow-50 via-yellow-100 to-amber-100 rounded-2xl p-6 text-center border border-yellow-200 hover:border-yellow-300">
+                                    <div class="relative">
+                                        <i class="fas fa-clock text-yellow-600 text-3xl mb-3 group-hover:scale-110 transition-transform animate-pulse"></i>
+                                        <div class="text-3xl font-black text-yellow-700 mb-1">{{ tournament_stats.upcoming_matches }}</div>
+                                        <div class="text-sm font-semibold text-yellow-600 uppercase tracking-wide">Upcoming</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card group bg-gradient-to-br from-purple-50 via-purple-100 to-violet-100 rounded-2xl p-6 text-center border border-purple-200 hover:border-purple-300">
+                                    <div class="relative">
+                                        <i class="fas fa-calendar text-purple-600 text-3xl mb-3 group-hover:scale-110 transition-transform"></i>
+                                        <div class="text-3xl font-black text-purple-700 mb-1">{{ tournament_stats.total_matches }}</div>
+                                        <div class="text-sm font-semibold text-purple-600 uppercase tracking-wide">Total Matches</div>
+                                    </div>
+                                </div>
+                                {% if stats.total_goals %}
+                                <div class="stat-card group bg-gradient-to-br from-red-50 via-red-100 to-pink-100 rounded-2xl p-6 text-center border border-red-200 hover:border-red-300">
+                                    <div class="relative">
+                                        <i class="fas fa-futbol text-red-600 text-3xl mb-3 group-hover:scale-110 transition-transform group-hover:animate-spin"></i>
+                                        <div class="text-3xl font-black text-red-700 mb-1">{{ stats.total_goals }}</div>
+                                        <div class="text-sm font-semibold text-red-600 uppercase tracking-wide">Total Goals</div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Standings Tab -->
+                        {% if standings and standings|length > 0 %}
+                        <div x-show="activeTab === 'standings'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="display: none;">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ 'Participant' if tournament.type == 'solo' else 'Team' }}</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MP</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">W</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">D</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">L</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GF</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GA</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">GD</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pts</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        {% for standing in standings %}
+                                        <tr class="{{ 'bg-yellow-50' if loop.index <= 3 else 'hover:bg-gray-50' }}">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold 
+                                                    {{ 'bg-yellow-100 text-yellow-800' if loop.index == 1 else 
+                                                       'bg-gray-100 text-gray-800' if loop.index <= 3 else 
+                                                       'bg-white text-gray-600' }}">
+                                                    {% if loop.index == 1 %}<i class="fas fa-crown"></i>{% else %}{{ loop.index }}{% endif %}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {% if tournament.type == 'solo' %}
+                                                                {{ standing.participant.name }}
+                                                            {% else %}
+                                                                {{ standing.team.name }}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ standing.matches_played }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">{{ standing.wins }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600 font-medium">{{ standing.draws }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">{{ standing.losses }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ standing.goals_for }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ standing.goals_against }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm {{ 'text-green-600' if standing.goal_difference > 0 else 'text-red-600' if standing.goal_difference < 0 else 'text-gray-900' }} font-medium">
+                                                {{ '+' if standing.goal_difference > 0 else '' }}{{ standing.goal_difference }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">{{ standing.points }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Fixtures Tab -->
+                        {% if matches and matches|length > 0 %}
+                        <div x-show="activeTab === 'fixtures'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="display: none;">
+                            <div class="space-y-6">
+                                {% if grouped_matches %}
+                                    {% for round_name, round_matches in grouped_matches.items() %}
+                                    <div>
+                                        <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                                            <i class="fas fa-layer-group text-green-600 mr-2"></i>
+                                            {{ round_name }}
+                                        </h4>
+                                        <div class="space-y-3">
+                                            {% for match in round_matches %}
+                                            <div class="bg-gray-50 rounded-lg p-4">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-4 flex-1">
+                                                        {% if tournament.type == 'solo' %}
+                                                        <div class="text-sm font-medium text-gray-900">{{ match.participant1_name or 'Player 1' }}</div>
+                                                        <div class="text-xs text-gray-500">vs</div>
+                                                        <div class="text-sm font-medium text-gray-900">{{ match.participant2_name or 'Player 2' }}</div>
+                                                        {% else %}
+                                                        <div class="text-sm font-medium text-gray-900">{{ match.team1_name or 'Team A' }}</div>
+                                                        <div class="text-xs text-gray-500">vs</div>
+                                                        <div class="text-sm font-medium text-gray-900">{{ match.team2_name or 'Team B' }}</div>
+                                                        {% endif %}
+                                                        
+                                                        {% if match.status == 'completed' %}
+                                                        <div class="flex items-center space-x-2">
+                                                            {% if tournament.type == 'solo' %}
+                                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">{{ match.participant1_score or 0 }}</span>
+                                                            <span class="text-xs text-gray-400">-</span>
+                                                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">{{ match.participant2_score or 0 }}</span>
+                                                            {% else %}
+                                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">{{ match.team1_score or 0 }}</span>
+                                                            <span class="text-xs text-gray-400">-</span>
+                                                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">{{ match.team2_score or 0 }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    
+                                                    <div class="flex items-center space-x-3">
+                                                        {% if match.scheduled_date %}
+                                                        <span class="text-xs text-gray-500">{{ match.scheduled_date[:10] }}</span>
+                                                        {% endif %}
+                                                        
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                                            {% if match.status == 'scheduled' %}bg-yellow-100 text-yellow-800{% endif %}
+                                                            {% if match.status == 'live' %}bg-red-100 text-red-800{% endif %}
+                                                            {% if match.status == 'completed' %}bg-green-100 text-green-800{% endif %}">
+                                                            {{ match.status|title }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for match in matches %}
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-4 flex-1">
+                                                {% if tournament.type == 'solo' %}
+                                                <div class="text-sm font-medium text-gray-900">{{ match.participant1_name or 'Player 1' }}</div>
+                                                <div class="text-xs text-gray-500">vs</div>
+                                                <div class="text-sm font-medium text-gray-900">{{ match.participant2_name or 'Player 2' }}</div>
+                                                {% else %}
+                                                <div class="text-sm font-medium text-gray-900">{{ match.team1_name or 'Team A' }}</div>
+                                                <div class="text-xs text-gray-500">vs</div>
+                                                <div class="text-sm font-medium text-gray-900">{{ match.team2_name or 'Team B' }}</div>
+                                                {% endif %}
+                                                
+                                                {% if match.status == 'completed' %}
+                                                <div class="flex items-center space-x-2">
+                                                    {% if tournament.type == 'solo' %}
+                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">{{ match.participant1_score or 0 }}</span>
+                                                    <span class="text-xs text-gray-400">-</span>
+                                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">{{ match.participant2_score or 0 }}</span>
+                                                    {% else %}
+                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">{{ match.team1_score or 0 }}</span>
+                                                    <span class="text-xs text-gray-400">-</span>
+                                                    <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">{{ match.team2_score or 0 }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="flex items-center space-x-3">
+                                                {% if match.scheduled_date %}
+                                                <span class="text-xs text-gray-500">{{ match.scheduled_date[:10] }}</span>
+                                                {% endif %}
+                                                
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                                    {% if match.status == 'scheduled' %}bg-yellow-100 text-yellow-800{% endif %}
+                                                    {% if match.status == 'live' %}bg-red-100 text-red-800{% endif %}
+                                                    {% if match.status == 'completed' %}bg-green-100 text-green-800{% endif %}">
+                                                    {{ match.status|title }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Enhanced Statistics Tab -->
+                        {% if stats %}
+                        <div x-show="activeTab === 'statistics'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="display: none;">
+                            <div class="space-y-8">
+                                <!-- Overview Statistics Cards -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <div class="stat-card bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 text-center border border-blue-200">
+                                        <i class="fas fa-futbol text-blue-600 text-3xl mb-3"></i>
+                                        <div class="text-3xl font-black text-blue-700">{{ stats.total_goals or 0 }}</div>
+                                        <div class="text-sm font-semibold text-blue-600 uppercase">Total Goals</div>
+                                    </div>
+                                    <div class="stat-card bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 text-center border border-green-200">
+                                        <i class="fas fa-calculator text-green-600 text-3xl mb-3"></i>
+                                        <div class="text-3xl font-black text-green-700">{{ "%.1f"|format(stats.avg_goals_per_match or 0) }}</div>
+                                        <div class="text-sm font-semibold text-green-600 uppercase">Goals/Match</div>
+                                    </div>
+                                    <div class="stat-card bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 text-center border border-yellow-200">
+                                        <i class="fas fa-shield-alt text-yellow-600 text-3xl mb-3"></i>
+                                        <div class="text-3xl font-black text-yellow-700">{{ stats.total_clean_sheets or 0 }}</div>
+                                        <div class="text-sm font-semibold text-yellow-600 uppercase">Clean Sheets</div>
+                                    </div>
+                                    <div class="stat-card bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 text-center border border-purple-200">
+                                        <i class="fas fa-handshake text-purple-600 text-3xl mb-3"></i>
+                                        <div class="text-3xl font-black text-purple-700">{{ "%.1f"|format(stats.draw_percentage or 0) }}%</div>
+                                        <div class="text-sm font-semibold text-purple-600 uppercase">Draw Rate</div>
+                                    </div>
+                                </div>
+
+                                <!-- Match Analysis -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                                        <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                            <i class="fas fa-chart-line text-indigo-600 mr-3"></i>
+                                            Match Analysis
+                                        </h4>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div class="flex items-center">
+                                                    <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                                                    <span class="font-medium text-gray-700">Completed Matches</span>
+                                                </div>
+                                                <span class="font-bold text-green-600">{{ stats.completed_matches or 0 }}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div class="flex items-center">
+                                                    <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                                                    <span class="font-medium text-gray-700">Total Matches</span>
+                                                </div>
+                                                <span class="font-bold text-blue-600">{{ stats.total_matches or 0 }}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div class="flex items-center">
+                                                    <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                                                    <span class="font-medium text-gray-700">Decisive Matches</span>
+                                                </div>
+                                                <span class="font-bold text-yellow-600">{{ "%.1f"|format(stats.decisive_percentage or 0) }}%</span>
+                                            </div>
+                                            {% if stats.completion_percentage %}
+                                            <div class="mt-4">
+                                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                                    <span>Tournament Progress</span>
+                                                    <span>{{ "%.1f"|format(stats.completion_percentage) }}%</span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" style="width: {{ stats.completion_percentage or 0 }}%"></div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Performance Breakdown -->
+                                    <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+                                        <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                            <i class="fas fa-trophy text-amber-600 mr-3"></i>
+                                            Performance Breakdown
+                                        </h4>
+                                        <div class="space-y-4">
+                                            {% if stats.highest_scoring_match %}
+                                            <div class="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-lg border border-red-200">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <div class="font-semibold text-red-800">Highest Scoring Match</div>
+                                                        <div class="text-sm text-red-600">Most goals in a single match</div>
+                                                    </div>
+                                                    <div class="text-2xl font-black text-red-600">{{ stats.highest_scoring_match.total_goals }}</div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            {% if stats.biggest_victory %}
+                                            <div class="p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-200">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <div class="font-semibold text-orange-800">Biggest Victory Margin</div>
+                                                        <div class="text-sm text-orange-600">Largest goal difference</div>
+                                                    </div>
+                                                    <div class="text-2xl font-black text-orange-600">{{ stats.biggest_victory.margin }}</div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            <div class="p-4 bg-gradient-to-r from-green-50 to-green-50 rounded-lg border border-green-200">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <div class="font-semibold text-green-800">Average Match Duration</div>
+                                                        <div class="text-sm text-green-600">Standard Football time</div>
+                                                    </div>
+                                                    <div class="text-2xl font-black text-green-600">{{ stats.avg_match_duration or 90 }}min</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Top Performers Section -->
+                                {% if tournament.type == 'solo' %}
+                                <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                                    <h4 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                                        <i class="fas fa-crown text-yellow-500 mr-3"></i>
+                                        Player Performance Leaders
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                        {% if stats.top_scorer %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-green-50 via-green-50 to-teal-50 rounded-2xl border border-green-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-futbol text-white text-2xl"></i>
+                                            </div>
+                                            <h5 class="font-bold text-green-800 mb-2">🏆 Top Scorer</h5>
+                                            <div class="text-3xl font-black text-green-700 mb-2">{{ stats.top_scorer.goals }}</div>
+                                            <div class="font-bold text-green-800">{{ stats.top_scorer.name }}</div>
+                                            <div class="text-sm text-green-600 mt-2">
+                                                {{ stats.top_scorer.matches_played }} matches played<br>
+                                                {{ "%.1f"|format(stats.top_scorer.goals / stats.top_scorer.matches_played if stats.top_scorer.matches_played > 0 else 0) }} goals/match
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.best_defense %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-shield-alt text-white text-2xl"></i>
+                                            </div>
+                                            <h5 class="font-bold text-blue-800 mb-2">🛡️ Best Defense</h5>
+                                            <div class="text-3xl font-black text-blue-700 mb-2">{{ stats.best_defense.goals_conceded }}</div>
+                                            <div class="font-bold text-blue-800">{{ stats.best_defense.name }}</div>
+                                            <div class="text-sm text-blue-600 mt-2">
+                                                {{ stats.best_defense.clean_sheets }} clean sheets<br>
+                                                Goals conceded
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.most_wins %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl border border-amber-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-medal text-white text-2xl"></i>
+                                            </div>
+                                            <h5 class="font-bold text-amber-800 mb-2">🏅 Most Wins</h5>
+                                            <div class="text-3xl font-black text-amber-700 mb-2">{{ stats.most_wins.wins }}</div>
+                                            <div class="font-bold text-amber-800">{{ stats.most_wins.name }}</div>
+                                            <div class="text-sm text-amber-600 mt-2">
+                                                {{ "%.1f"|format(stats.most_wins.win_percentage) }}% win rate<br>
+                                                Victory specialist
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <!-- Team Performance Leaders -->
+                                <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                                    <h4 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                                        <i class="fas fa-users text-blue-500 mr-3"></i>
+                                        Team Performance Leaders
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                        {% if stats.top_scoring_team %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-green-50 via-green-50 to-teal-50 rounded-2xl border border-green-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-bullseye text-white text-2xl"></i>
+                                            </div>
+                                            <h5 class="font-bold text-green-800 mb-2">⚽ Attacking Force</h5>
+                                            <div class="text-3xl font-black text-green-700 mb-2">{{ stats.top_scoring_team.goals_for }}</div>
+                                            <div class="font-bold text-green-800">{{ stats.top_scoring_team.name }}</div>
+                                            <div class="text-sm text-green-600 mt-2">
+                                                {{ "%.1f"|format(stats.top_scoring_team.goals_per_match) }} goals/match<br>
+                                                Offensive powerhouse
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.best_defense_team %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-shield-alt text-white text-2xl"></i>
+                                            </div>
+                                            <h5 class="font-bold text-blue-800 mb-2">🛡️ Defensive Wall</h5>
+                                            <div class="text-3xl font-black text-blue-700 mb-2">{{ stats.best_defense_team.goals_against }}</div>
+                                            <div class="font-bold text-blue-800">{{ stats.best_defense_team.name }}</div>
+                                            <div class="text-sm text-blue-600 mt-2">
+                                                {{ stats.best_defense_team.clean_sheets }} clean sheets<br>
+                                                Goals conceded
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.most_successful_team %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl border border-amber-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-trophy text-white text-2xl"></i>
+                                            </div>
+                                            <h5 class="font-bold text-amber-800 mb-2">🏆 Most Successful</h5>
+                                            <div class="text-3xl font-black text-amber-700 mb-2">{{ stats.most_successful_team.wins }}</div>
+                                            <div class="font-bold text-amber-800">{{ stats.most_successful_team.name }}</div>
+                                            <div class="text-sm text-amber-600 mt-2">
+                                                {{ "%.1f"|format(stats.most_successful_team.win_percentage) }}% win rate<br>
+                                                Championship material
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Key Tournament Records -->
+                                <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                                    <h4 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                                        <i class="fas fa-award text-purple-600 mr-3"></i>
+                                        Tournament Records
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {% if stats.total_goals %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border border-red-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-futbol text-white text-2xl"></i>
+                                            </div>
+                                            <div class="text-3xl font-black text-red-700 mb-2">{{ stats.total_goals }}</div>
+                                            <div class="text-sm font-semibold text-red-600 uppercase tracking-wide">Goals Scored</div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.total_clean_sheets %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-shield-alt text-white text-2xl"></i>
+                                            </div>
+                                            <div class="text-3xl font-black text-blue-700 mb-2">{{ stats.total_clean_sheets }}</div>
+                                            <div class="text-sm font-semibold text-blue-600 uppercase tracking-wide">Clean Sheets</div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.avg_goals_per_match %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-chart-line text-white text-2xl"></i>
+                                            </div>
+                                            <div class="text-3xl font-black text-green-700 mb-2">{{ "%.1f"|format(stats.avg_goals_per_match) }}</div>
+                                            <div class="text-sm font-semibold text-green-600 uppercase tracking-wide">Goals Per Match</div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if stats.completed_matches %}
+                                        <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200">
+                                            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                <i class="fas fa-check-circle text-white text-2xl"></i>
+                                            </div>
+                                            <div class="text-3xl font-black text-purple-700 mb-2">{{ stats.completed_matches }}</div>
+                                            <div class="text-sm font-semibold text-purple-600 uppercase tracking-wide">Matches Played</div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Detailed Player Statistics Tables -->
+                                {% if standings and standings|length > 0 %}
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <!-- Goal Scorers Table -->
+                                    <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                                        <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                            <i class="fas fa-futbol text-red-600 mr-3"></i>
+                                            {% if tournament.type == 'solo' %}Top Goal Scorers{% else %}Team Goal Statistics{% endif %}
+                                        </h4>
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full">
+                                                <thead>
+                                                    <tr class="bg-red-50">
+                                                        <th class="px-4 py-3 text-left text-xs font-bold text-red-800 uppercase tracking-wide">#</th>
+                                                        <th class="px-4 py-3 text-left text-xs font-bold text-red-800 uppercase tracking-wide">{{ 'Player' if tournament.type == 'solo' else 'Team' }}</th>
+                                                        <th class="px-4 py-3 text-center text-xs font-bold text-red-800 uppercase tracking-wide">Goals</th>
+                                                        <th class="px-4 py-3 text-center text-xs font-bold text-red-800 uppercase tracking-wide">Matches</th>
+                                                        <th class="px-4 py-3 text-center text-xs font-bold text-red-800 uppercase tracking-wide">Avg</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-red-100">
+                                                    {% for standing in standings|sort(attribute='goals_for', reverse=true) %}
+                                                    {% if standing.goals_for > 0 %}
+                                                    <tr class="hover:bg-red-25 transition-colors group">
+                                                        <td class="px-4 py-3">
+                                                            <div class="flex items-center">
+                                                                {% if loop.index == 1 %}
+                                                                    <div class="w-6 h-6 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                                                        👑
+                                                                    </div>
+                                                                {% elif loop.index <= 3 %}
+                                                                    <div class="w-6 h-6 bg-gradient-to-r from-red-400 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                                                        {{ loop.index }}
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-medium text-xs">
+                                                                        {{ loop.index }}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3">
+                                                            <div class="font-medium text-gray-900 group-hover:text-red-700 transition-colors">
+                                                                {% if tournament.type == 'solo' %}
+                                                                    {{ standing.participant.name }}
+                                                                {% else %}
+                                                                    {{ standing.team.name }}
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <span class="font-bold text-red-600 text-lg">{{ standing.goals_for }}</span>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center text-gray-600">{{ standing.matches_played }}</td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <span class="font-medium text-gray-700">{{ "%.1f"|format(standing.goals_for / standing.matches_played if standing.matches_played > 0 else 0) }}</span>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Defense Statistics Table -->
+                                    <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                                        <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                                            <i class="fas fa-shield-alt text-blue-600 mr-3"></i>
+                                            {% if tournament.type == 'solo' %}Best Defensive Records{% else %}Team Defensive Stats{% endif %}
+                                        </h4>
+                                        <div class="overflow-x-auto">
+                                            <table class="min-w-full">
+                                                <thead>
+                                                    <tr class="bg-blue-50">
+                                                        <th class="px-4 py-3 text-left text-xs font-bold text-blue-800 uppercase tracking-wide">#</th>
+                                                        <th class="px-4 py-3 text-left text-xs font-bold text-blue-800 uppercase tracking-wide">{{ 'Player' if tournament.type == 'solo' else 'Team' }}</th>
+                                                        <th class="px-4 py-3 text-center text-xs font-bold text-blue-800 uppercase tracking-wide">GA</th>
+                                                        <th class="px-4 py-3 text-center text-xs font-bold text-blue-800 uppercase tracking-wide">Clean Sheets</th>
+                                                        <th class="px-4 py-3 text-center text-xs font-bold text-blue-800 uppercase tracking-wide">Avg GA</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-blue-100">
+                                                    {% for standing in standings|sort(attribute='goals_against') %}
+                                                    {% if standing.matches_played > 0 %}
+                                                    <tr class="hover:bg-blue-25 transition-colors group">
+                                                        <td class="px-4 py-3">
+                                                            <div class="flex items-center">
+                                                                {% if loop.index == 1 %}
+                                                                    <div class="w-6 h-6 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                                                        🛡️
+                                                                    </div>
+                                                                {% elif loop.index <= 3 %}
+                                                                    <div class="w-6 h-6 bg-gradient-to-r from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                                                        {{ loop.index }}
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-medium text-xs">
+                                                                        {{ loop.index }}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3">
+                                                            <div class="font-medium text-gray-900 group-hover:text-blue-700 transition-colors">
+                                                                {% if tournament.type == 'solo' %}
+                                                                    {{ standing.participant.name }}
+                                                                {% else %}
+                                                                    {{ standing.team.name }}
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <span class="font-bold {{ 'text-green-600' if standing.goals_against == 0 else 'text-blue-600' }} text-lg">{{ standing.goals_against }}</span>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <div class="flex items-center justify-center">
+                                                                <span class="font-bold text-green-600 mr-2">{{ standing.clean_sheets or 0 }}</span>
+                                                                {% if standing.clean_sheets > 0 %}
+                                                                    <span class="text-green-500">🏆</span>
+                                                                {% endif %}
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <span class="font-medium text-gray-700">{{ "%.1f"|format(standing.goals_against / standing.matches_played if standing.matches_played > 0 else 0) }}</span>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Registration Card -->
+                <div class="feature-card rounded-2xl shadow-xl p-8 border border-green-100">
+                    <div class="text-center">
+                        {% if tournament.status == 'registration_open' %}
+                            <div class="mb-4">
+                                <i class="fas fa-user-plus text-4xl text-green-600 mb-2"></i>
+                                <h3 class="text-xl font-bold text-gray-900">Join Tournament</h3>
+                                {% if tournament.type == 'solo' %}
+                                    <p class="text-gray-600">Register as an individual player</p>
+                                {% else %}
+                                    <p class="text-gray-600">Register your team</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                                <div class="text-center">
+                                    {% if tournament.type == 'solo' %}
+                                        <div class="text-2xl font-black text-gray-900">{{ tournament.participant_count or 0 }}</div>
+                                        <div class="text-sm text-gray-600">out of {{ tournament.max_participants or '∞' }} players</div>
+                                    {% else %}
+                                        <div class="text-2xl font-black text-gray-900">{{ tournament.team_count or 0 }}</div>
+                                        <div class="text-sm text-gray-600">out of {{ tournament.max_teams or '∞' }} teams</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <a href="{{ url_for('main.tournament_register', tournament_id=tournament.id) }}" 
+                               class="w-full floating-cta btn-primary text-white px-6 py-3 rounded-xl font-bold transition-all block text-center">
+                                <i class="fas fa-plus mr-2"></i>Register Now
+                            </a>
+
+                            {% if tournament.registration_deadline %}
+                            <p class="mt-3 text-xs text-gray-500">
+                                Registration closes {{ tournament.registration_deadline[:10] }}
+                            </p>
+                            {% endif %}
+                        {% elif tournament.status == 'upcoming' %}
+                            <div class="mb-4">
+                                <i class="fas fa-clock text-4xl text-yellow-600 mb-2"></i>
+                                <h3 class="text-xl font-bold text-gray-900">Registration Closed</h3>
+                                <p class="text-gray-600">Tournament starts soon</p>
+                            </div>
+                        {% elif tournament.status == 'in_progress' %}
+                            <div class="mb-4">
+                                <i class="fas fa-play text-4xl text-blue-600 mb-2"></i>
+                                <h3 class="text-xl font-bold text-gray-900">In Progress</h3>
+                                <p class="text-gray-600">Tournament is currently active</p>
+                            </div>
+                        {% else %}
+                            <div class="mb-4">
+                                <i class="fas fa-flag-checkered text-4xl text-gray-600 mb-2"></i>
+                                <h3 class="text-xl font-bold text-gray-900">Tournament Completed</h3>
+                                <p class="text-gray-600">Results available</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="feature-card rounded-2xl shadow-xl p-8 border border-green-100">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-chart-bar text-white text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900">Quick Stats</h3>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Tournament Type</span>
+                            <span class="font-semibold text-gray-900">{{ tournament.type|title }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Format</span>
+                            <span class="font-semibold text-gray-900">{{ tournament.format|replace('_', ' ')|title }}</span>
+                        </div>
+                        {% if tournament.type == 'solo' %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Registered</span>
+                                <span class="font-semibold text-gray-900">{{ tournament.participant_count or 0 }}</span>
+                            </div>
+                        {% else %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Teams</span>
+                                <span class="font-semibold text-gray-900">{{ tournament.team_count or 0 }}</span>
+                            </div>
+                        {% endif %}
+                        {% if tournament.entry_fee %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Entry Fee</span>
+                                <span class="font-semibold text-gray-900">${{ tournament.entry_fee }}</span>
+                            </div>
+                        {% endif %}
+                        {% if tournament.prize_pool %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Prize Pool</span>
+                                <span class="font-semibold text-green-600">${{ tournament.prize_pool }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced JavaScript for Interactive Features -->
+<script>
+    // Scroll Progress Bar
+    window.addEventListener('scroll', () => {
+        const scrollProgress = document.getElementById('scrollProgress');
+        if (scrollProgress) {
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            scrollProgress.style.width = scrollPercent + '%';
+        }
+    });
+    
+    // Intersection Observer for fade-in animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+                
+                // Add staggered animation for stat cards
+                if (entry.target.classList.contains('stat-card')) {
+                    const cards = entry.target.parentElement.children;
+                    Array.from(cards).forEach((card, index) => {
+                        if (card.classList.contains('stat-card')) {
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, index * 100);
+                        }
+                    });
+                }
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all elements that should fade in
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fix initial tab display - show overview tab by default
+        const overviewTab = document.querySelector('[x-show="activeTab === \'overview\'"]');
+        if (overviewTab) {
+            overviewTab.style.display = 'block';
+        }
+        const elementsToObserve = document.querySelectorAll('.feature-card, .stat-card, .match-card');
+        elementsToObserve.forEach(el => {
+            // Initially hide elements for animation
+            if (el.classList.contains('stat-card')) {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            }
+            observer.observe(el);
+        });
+        
+        // Enhanced tab switching with smooth transitions
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Add click ripple effect
+                const ripple = document.createElement('div');
+                ripple.classList.add('absolute', 'rounded-full', 'bg-white/30', 'pointer-events-none');
+                ripple.style.width = '0';
+                ripple.style.height = '0';
+                ripple.style.top = '50%';
+                ripple.style.left = '50%';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                
+                button.appendChild(ripple);
+                
+                setTimeout(() => {
+                    button.removeChild(ripple);
+                }, 600);
+            });
+        });
+        
+        // Auto-play stat counters when visible
+        const statNumbers = document.querySelectorAll('.stat-card .text-3xl');
+        statNumbers.forEach(stat => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateCounter(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            observer.observe(stat);
+        });
+        
+        // Tournament status pulse animation
+        const statusBadge = document.querySelector('.status-badge');
+        if (statusBadge && statusBadge.textContent.includes('In Progress')) {
+            statusBadge.classList.add('live-pulse');
+        }
+    });
+    
+    // Counter animation function
+    function animateCounter(element) {
+        const finalValue = parseInt(element.textContent.replace(/[^0-9.]/g, ''));
+        const duration = 1500;
+        const startTime = performance.now();
+        
+        if (isNaN(finalValue)) return;
+        
+        function updateCounter(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const currentValue = Math.floor(progress * finalValue);
+            
+            element.textContent = element.textContent.replace(/^\d+/, currentValue);
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            }
+        }
+        
+        requestAnimationFrame(updateCounter);
+    }
+    
+    // Enhanced table row hover effects
+    const tableRows = document.querySelectorAll('.standings-table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.transform = 'scale(1.01)';
+            row.style.zIndex = '10';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            row.style.transform = 'scale(1)';
+            row.style.zIndex = 'auto';
+        });
+    });
+    
+    // Add ripple effect keyframes dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+        
+        /* Smooth entry animations */
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Progress bar pulse */
+        .scroll-progress {
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Smooth scrolling for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock %}

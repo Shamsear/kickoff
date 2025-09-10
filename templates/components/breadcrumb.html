@@ -1,0 +1,34 @@
+<!-- Breadcrumb Navigation Component -->
+<!-- Usage: {% include 'components/breadcrumb.html' with context %} -->
+{% set breadcrumbs = breadcrumbs or [] %}
+
+{% if breadcrumbs %}
+<nav class="bg-white border-b border-gray-200" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <ol class="flex items-center space-x-2 py-3 text-sm" itemscope itemtype="https://schema.org/BreadcrumbList">
+            <!-- Home breadcrumb -->
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="{{ url_for('main.index') }}" class="text-gray-400 hover:text-gray-500 transition-colors" itemprop="item">
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                    <span class="sr-only" itemprop="name">Home</span>
+                </a>
+                <meta itemprop="position" content="1" />
+            </li>
+            
+            {% for crumb in breadcrumbs %}
+                <li class="flex items-center" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                    <i class="fas fa-chevron-right text-gray-300 text-xs mx-2" aria-hidden="true"></i>
+                    {% if crumb.url and not loop.last %}
+                        <a href="{{ crumb.url }}" class="text-gray-600 hover:text-gray-900 transition-colors font-medium" itemprop="item">
+                            <span itemprop="name">{{ crumb.name }}</span>
+                        </a>
+                    {% else %}
+                        <span class="text-gray-900 font-semibold" aria-current="page" itemprop="name">{{ crumb.name }}</span>
+                    {% endif %}
+                    <meta itemprop="position" content="{{ loop.index + 1 }}" />
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+</nav>
+{% endif %}

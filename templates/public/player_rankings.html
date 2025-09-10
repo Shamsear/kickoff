@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Player Rankings - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    .ranking-card {
+        transition: all 0.3s ease;
+    }
+    
+    .ranking-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .podium-1 {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        border: 2px solid #d97706;
+    }
+    
+    .podium-2 {
+        background: linear-gradient(135deg, #9ca3af, #6b7280);
+        border: 2px solid #4b5563;
+    }
+    
+    .podium-3 {
+        background: linear-gradient(135deg, #cd7c2f, #a16207);
+        border: 2px solid #92400e;
+    }
+    
+    .tab-button {
+        transition: all 0.3s ease;
+    }
+    
+    .tab-button.active {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700 relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="text-center">
+                <div class="flex items-center justify-center mb-6">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mr-4 shadow-lg">
+                        <i class="fas fa-medal text-yellow-500 text-2xl"></i>
+                    </div>
+                    <h1 class="text-4xl lg:text-6xl font-black text-white">
+                        Player Rankings
+                    </h1>
+                </div>
+                <p class="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+                    Discover the top Football players based on tournament performance, win rates, and overall statistics.
+                </p>
+                {% if total_players > 0 %}
+                <div class="mt-6 inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white">
+                    <i class="fas fa-users mr-2"></i>
+                    <span class="font-semibold">{{ total_players }} Players Ranked</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {% if total_players > 0 %}
+        <!-- Tab Navigation -->
+        <div class="mb-8 flex flex-wrap justify-center gap-2">
+            <button onclick="showTab('tournaments-won')" id="tab-tournaments-won" class="tab-button active px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-lg hover:bg-gray-50 transition-all">
+                <i class="fas fa-trophy mr-2"></i>Tournament Wins
+            </button>
+            <button onclick="showTab('total-points')" id="tab-total-points" class="tab-button px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-lg hover:bg-gray-50 transition-all">
+                <i class="fas fa-star mr-2"></i>Total Points
+            </button>
+            <button onclick="showTab('win-rate')" id="tab-win-rate" class="tab-button px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-lg hover:bg-gray-50 transition-all">
+                <i class="fas fa-percentage mr-2"></i>Win Rate
+            </button>
+            <button onclick="showTab('top-scorers')" id="tab-top-scorers" class="tab-button px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl shadow-lg hover:bg-gray-50 transition-all">
+                <i class="fas fa-futbol mr-2"></i>Top Scorers
+            </button>
+        </div>
+        
+        <!-- Tournament Winners Tab -->
+        <div id="content-tournaments-won" class="tab-content">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Most Tournament Wins</h2>
+            {% if top_by_tournaments_won %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for player in top_by_tournaments_won %}
+                <div class="ranking-card bg-white rounded-2xl p-6 shadow-xl border-l-4 {{ 'podium-1' if loop.index == 1 else 'podium-2' if loop.index == 2 else 'podium-3' if loop.index == 3 else 'border-gray-300' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-lg font-black text-gray-700">#{{ loop.index }}</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">{{ player.name }}</h3>
+                                <p class="text-sm text-gray-600">{{ player.tournaments_played }} tournament{{ 's' if player.tournaments_played != 1 else '' }} played</p>
+                            </div>
+                        </div>
+                        {% if loop.index <= 3 %}
+                        <div class="text-3xl">
+                            {% if loop.index == 1 %}🥇
+                            {% elif loop.index == 2 %}🥈
+                            {% else %}🥉
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-3 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg">
+                            <div class="text-2xl font-black text-yellow-700">{{ player.tournaments_won }}</div>
+                            <div class="text-xs text-yellow-600 uppercase font-semibold">Championships</div>
+                        </div>
+                        <div class="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+                            <div class="text-2xl font-black text-blue-700">{{ "%.1f"|format(player.avg_points_per_tournament) }}</div>
+                            <div class="text-xs text-blue-600 uppercase font-semibold">Avg Points</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex justify-between items-center text-sm text-gray-600">
+                            <span>{{ player.total_wins }}W {{ player.total_draws }}D {{ player.total_losses }}L</span>
+                            <span>{{ "%.1f"|format(player.win_rate) }}% win rate</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-trophy text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-600">No tournament winners data available yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Total Points Tab -->
+        <div id="content-total-points" class="tab-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Highest Point Earners</h2>
+            {% if top_by_points %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for player in top_by_points %}
+                <div class="ranking-card bg-white rounded-2xl p-6 shadow-xl border-l-4 {{ 'podium-1' if loop.index == 1 else 'podium-2' if loop.index == 2 else 'podium-3' if loop.index == 3 else 'border-gray-300' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-lg font-black text-gray-700">#{{ loop.index }}</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">{{ player.name }}</h3>
+                                <p class="text-sm text-gray-600">{{ player.tournaments_played }} tournament{{ 's' if player.tournaments_played != 1 else '' }}</p>
+                            </div>
+                        </div>
+                        {% if loop.index <= 3 %}
+                        <div class="text-3xl">
+                            {% if loop.index == 1 %}🥇
+                            {% elif loop.index == 2 %}🥈
+                            {% else %}🥉
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <div class="text-4xl font-black text-indigo-600">{{ player.total_points }}</div>
+                        <div class="text-sm text-gray-600">Total Points</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+                            <div class="text-lg font-bold text-green-700">{{ "%.1f"|format(player.avg_points_per_tournament) }}</div>
+                            <div class="text-xs text-green-600 uppercase font-semibold">Avg per Tournament</div>
+                        </div>
+                        <div class="text-center p-3 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg">
+                            <div class="text-lg font-bold text-orange-700">{{ player.tournaments_won }}</div>
+                            <div class="text-xs text-orange-600 uppercase font-semibold">Championships</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-star text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-600">No points data available yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Win Rate Tab -->
+        <div id="content-win-rate" class="tab-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Best Win Rates</h2>
+            <p class="text-center text-gray-600 mb-8">(Minimum 3 tournaments played)</p>
+            {% if top_by_win_rate %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for player in top_by_win_rate %}
+                <div class="ranking-card bg-white rounded-2xl p-6 shadow-xl border-l-4 {{ 'podium-1' if loop.index == 1 else 'podium-2' if loop.index == 2 else 'podium-3' if loop.index == 3 else 'border-gray-300' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-lg font-black text-gray-700">#{{ loop.index }}</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">{{ player.name }}</h3>
+                                <p class="text-sm text-gray-600">{{ player.tournaments_played }} tournaments</p>
+                            </div>
+                        </div>
+                        {% if loop.index <= 3 %}
+                        <div class="text-3xl">
+                            {% if loop.index == 1 %}🥇
+                            {% elif loop.index == 2 %}🥈
+                            {% else %}🥉
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <div class="text-4xl font-black text-green-600">{{ "%.1f"|format(player.win_rate) }}%</div>
+                        <div class="text-sm text-gray-600">Win Rate</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="p-2 bg-green-50 rounded-lg">
+                            <div class="text-lg font-bold text-green-700">{{ player.total_wins }}</div>
+                            <div class="text-xs text-green-600 uppercase">Wins</div>
+                        </div>
+                        <div class="p-2 bg-yellow-50 rounded-lg">
+                            <div class="text-lg font-bold text-yellow-700">{{ player.total_draws }}</div>
+                            <div class="text-xs text-yellow-600 uppercase">Draws</div>
+                        </div>
+                        <div class="p-2 bg-red-50 rounded-lg">
+                            <div class="text-lg font-bold text-red-700">{{ player.total_losses }}</div>
+                            <div class="text-xs text-red-600 uppercase">Losses</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-percentage text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-600">No win rate data available yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Top Scorers Tab -->
+        <div id="content-top-scorers" class="tab-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Top Goal Scorers</h2>
+            {% if top_by_goals %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for player in top_by_goals %}
+                <div class="ranking-card bg-white rounded-2xl p-6 shadow-xl border-l-4 {{ 'podium-1' if loop.index == 1 else 'podium-2' if loop.index == 2 else 'podium-3' if loop.index == 3 else 'border-gray-300' }}">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-lg font-black text-gray-700">#{{ loop.index }}</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">{{ player.name }}</h3>
+                                <p class="text-sm text-gray-600">{{ player.tournaments_played }} tournaments</p>
+                            </div>
+                        </div>
+                        {% if loop.index <= 3 %}
+                        <div class="text-3xl">
+                            {% if loop.index == 1 %}🥇
+                            {% elif loop.index == 2 %}🥈
+                            {% else %}🥉
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <div class="text-4xl font-black text-red-600">{{ player.total_goals_for }}</div>
+                        <div class="text-sm text-gray-600">Goals Scored</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+                            <div class="text-lg font-bold text-green-700">{{ player.goal_difference }}</div>
+                            <div class="text-xs text-green-600 uppercase font-semibold">Goal Difference</div>
+                        </div>
+                        <div class="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+                            <div class="text-lg font-bold text-blue-700">{{ "%.1f"|format(player.total_goals_for / player.tournaments_played) }}</div>
+                            <div class="text-xs text-blue-600 uppercase font-semibold">Per Tournament</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-futbol text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-600">No scoring data available yet.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% else %}
+        <!-- No Players Yet -->
+        <div class="text-center py-16">
+            <div class="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fas fa-medal text-gray-400 text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">No Player Rankings Available</h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+                Player rankings will appear here once tournaments are completed and results are recorded.
+            </p>
+            <div class="space-x-4">
+                <a href="{{ url_for('main.explore') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-green-800 transition-colors">
+                    <i class="fas fa-search mr-2"></i>
+                    Browse Tournaments
+                </a>
+                <a href="{{ url_for('main.live_tournaments') }}" class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-bold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-broadcast-tower mr-2"></i>
+                    Watch Live Action
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- JavaScript for tabs -->
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Remove active class from all buttons
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.classList.remove('active');
+        button.classList.add('bg-white', 'text-gray-700');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById('content-' + tabName);
+    if (selectedContent) {
+        selectedContent.classList.remove('hidden');
+    }
+    
+    // Add active class to clicked button
+    const selectedButton = document.getElementById('tab-' + tabName);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+        selectedButton.classList.remove('bg-white', 'text-gray-700');
+    }
+}
+
+// Initialize with first tab active
+document.addEventListener('DOMContentLoaded', function() {
+    showTab('tournaments-won');
+});
+</script>
+{% endblock %}

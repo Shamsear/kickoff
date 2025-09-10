@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Kickoff Arena{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .floating-shape { position: absolute; opacity: 0.08; animation: float 6s ease-in-out infinite; }
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-10px)} }
+    .feature-card { background: linear-gradient(135deg,#fff 0%,#f8fafc 100%); border: 1px solid rgba(76,175,80,.1); transition: all .3s ease; }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(76,175,80,.12); border-color: rgba(76,175,80,.2); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Dashboard Header with Breadcrumbs -->
+    <div class="hero-gradient shadow">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumb -->
+            <nav class="flex pt-20 pb-3" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <div>
+                            <a href="{{ url_for('main.index') }}" class="text-gray-600 hover:text-gray-700 text-sm">
+                                <i class="fas fa-home"></i>
+                                <span class="sr-only">Home</span>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 text-xs mx-3"></i>
+                            <span class="text-sm font-semibold text-gray-900">Dashboard</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="md:flex md:items-center md:justify-between pb-8">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-3xl font-black text-gray-900">
+                        <i class="fas fa-tachometer-alt text-green-600 mr-3"></i>
+                        Welcome back, {{ user.full_name }}!
+                    </h1>
+                    <p class="mt-2 text-base text-gray-700">
+                        Manage your tournaments and track their progress in real-time.
+                    </p>
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row sm:space-x-3 md:mt-0 md:ml-4">
+                    <a href="{{ url_for('tournament.create') }}" 
+                       class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5">
+                        <i class="fas fa-plus mr-2"></i>Create New Tournament
+                    </a>
+                    <a href="{{ url_for('main.explore') }}" 
+                       class="inline-flex items-center justify-center px-6 py-3 border border-gray-200 text-base font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-all duration-200 mt-3 sm:mt-0">
+                        <i class="fas fa-search mr-2"></i>Browse Tournaments
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow p-6 feature-card">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                            <i class="fas fa-trophy text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-semibold text-gray-600">Total Tournaments</p>
+                        <p class="text-2xl font-black text-gray-900" data-stat="total">{{ stats.total_tournaments }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6 feature-card">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                            <i class="fas fa-play-circle text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-semibold text-gray-600">Active</p>
+                        <p class="text-2xl font-black text-gray-900" data-stat="active">{{ stats.active_tournaments }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6 feature-card">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-semibold text-gray-600">Completed</p>
+                        <p class="text-2xl font-black text-gray-900" data-stat="completed">{{ stats.completed_tournaments }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow p-6 feature-card">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-semibold text-gray-600">Upcoming</p>
+                        <p class="text-2xl font-black text-gray-900" data-stat="upcoming">{{ stats.upcoming_tournaments }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Your Tournaments -->
+            <div class="lg:col-span-2">
+                <div class="bg-white shadow rounded-2xl feature-card">
+                    <div class="px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+                        <h3 class="text-lg font-bold text-gray-900">
+                            <i class="fas fa-list mr-2"></i>Your Tournaments
+                        </h3>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        {% if tournaments %}
+                            {% for tournament in tournaments %}
+                            <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="flex-shrink-0">
+                                                {% if tournament.sport == 'soccer' %}
+                                                    <i class="fas fa-futbol text-green-600"></i>
+                                                {% elif tournament.sport == 'basketball' %}
+                                                    <i class="fas fa-basketball-ball text-orange-600"></i>
+                                                {% elif tournament.sport == 'volleyball' %}
+                                                    <i class="fas fa-volleyball-ball text-blue-600"></i>
+                                                {% else %}
+                                                    <i class="fas fa-trophy text-green-600"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-sm font-bold text-gray-900">
+                                                    <a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" 
+                                                       class="hover:text-green-700">{{ tournament.name }}</a>
+                                                </h4>
+                                                <p class="text-sm text-gray-600">
+                                                    {{ tournament.format|title }} • {{ tournament.sport|title }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                                                   {% if tournament.status == 'in_progress' %}bg-green-100 text-green-800
+                                                   {% elif tournament.status == 'completed' %}bg-blue-100 text-blue-800
+                                                   {% elif tournament.status == 'draft' %}bg-gray-100 text-gray-800
+                                                   {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                            {{ tournament.status|replace('_', ' ')|title }}
+                                        </span>
+                                        <a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" 
+                                           class="text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="px-6 py-8 text-center">
+                                <div class="text-gray-400 mb-4">
+                                    <i class="fas fa-trophy text-4xl"></i>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-900 mb-2">No tournaments yet</h4>
+                                <p class="text-gray-600 mb-4">Create your first tournament to get started!</p>
+                                <a href="{{ url_for('tournament.create') }}" 
+                                   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+                                    <i class="fas fa-plus mr-1"></i>Create Tournament
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="space-y-6">
+                <!-- Quick Actions Card -->
+                <div class="bg-white shadow rounded-2xl p-6 feature-card">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-bolt mr-2"></i>Quick Actions
+                    </h3>
+                    <div class="space-y-3">
+                        <a href="{{ url_for('tournament.create') }}" 
+                           class="flex items-center w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="bg-green-100 text-green-600 p-2 rounded mr-3">
+                                <i class="fas fa-plus text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900">Create Tournament</p>
+                                <p class="text-xs text-gray-600">Start a new competition</p>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ url_for('main.explore') }}" 
+                           class="flex items-center w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="bg-green-100 text-green-600 p-2 rounded mr-3">
+                                <i class="fas fa-search text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900">Explore Tournaments</p>
+                                <p class="text-xs text-gray-600">Find public tournaments</p>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ url_for('auth.profile') }}" 
+                           class="flex items-center w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded mr-3">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900">Edit Profile</p>
+                                <p class="text-xs text-gray-600">Update your information</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-white shadow rounded-2xl p-6 feature-card">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">
+                        <i class="fas fa-clock mr-2"></i>Recent Activity
+                    </h3>
+                    <div class="space-y-3">
+                        {% if recent_tournaments %}
+                            {% for tournament in recent_tournaments %}
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-green-100 text-green-600 p-1 rounded">
+                                        <i class="fas fa-trophy text-xs"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-gray-900">
+                                        <a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" 
+                                           class="font-medium hover:text-green-700">{{ tournament.name }}</a>
+                                    </p>
+                                    <p class="text-xs text-gray-600">
+                                        Created {{ tournament.created_at[:10] }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-sm text-gray-600">No recent activity</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Auto-refresh statistics every 30 seconds
+    setInterval(function() {
+        fetch('{{ url_for("main.api_stats") }}')
+            .then(response => response.json())
+            .then(data => {
+                const m = (sel) => document.querySelector(sel);
+                if (m('[data-stat="total"]')) m('[data-stat="total"]').textContent = data.total_tournaments;
+                if (m('[data-stat="active"]')) m('[data-stat="active"]').textContent = data.active_tournaments;
+                if (m('[data-stat="completed"]')) m('[data-stat="completed"]').textContent = data.completed_tournaments;
+                if (m('[data-stat="upcoming"]')) m('[data-stat="upcoming"]').textContent = data.upcoming_tournaments;
+            })
+            .catch(error => console.error('Error updating stats:', error));
+    }, 30000);
+</script>
+{% endblock %}
+{% endblock %}

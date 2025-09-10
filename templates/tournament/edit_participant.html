@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Participant - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .floating-shape {
+        position: absolute;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+    }
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-10px)} }
+    .form-card {
+        background: linear-gradient(135deg,#fff 0%,#f8fafc 100%);
+        border: 1px solid rgba(16,185,129,.1);
+        transition: all .3s ease;
+    }
+    .form-card:hover {
+        box-shadow: 0 20px 40px rgba(16,185,129,.08);
+        border-color: rgba(16,185,129,.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Hero Header -->
+    <div class="hero-gradient border-b border-green-100">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2">
+                    <li><a href="{{ url_for('main.index') }}" class="hover:text-gray-900"><i class="fas fa-home"></i></a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-gray-900">{{ tournament.name }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.participants', tournament_id=tournament.id) }}" class="hover:text-gray-900">Participants</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li class="text-gray-900 font-semibold">Edit {{ participant.name }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-user-edit text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black text-gray-900">Edit Participant</h1>
+                        <p class="text-gray-700">Update details for <span class="font-semibold text-green-600">{{ participant.name }}</span></p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <!-- Participant Avatar -->
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-sm">
+                        <span class="text-white font-bold text-lg">{{ participant.name[:2]|upper }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="form-card rounded-2xl shadow-lg">
+            <div class="px-8 py-6 bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-black text-gray-900 flex items-center">
+                            <i class="fas fa-user-cog text-green-600 mr-3"></i>
+                            Participant Information
+                        </h2>
+                        <p class="text-green-700 mt-1">Update the player's tournament details</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        {% if participant.is_approved %}
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                            <i class="fas fa-check mr-1.5"></i>
+                            Approved
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-clock mr-1.5"></i>
+                            Pending
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <form id="editParticipantForm" class="p-8 space-y-8">
+                <!-- Personal Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-user text-green-500 mr-2"></i>
+                        Personal Details
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Player Name *</label>
+                            <input type="text" name="name" required
+                                   value="{{ participant.name or '' }}"
+                                   class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                   placeholder="Full name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Gamer Tag</label>
+                            <div class="relative">
+                                <i class="fas fa-gamepad absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="text" name="gamer_tag"
+                                       value="{{ participant.gamer_tag or '' }}"
+                                       class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                       placeholder="Football username">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-address-book text-blue-500 mr-2"></i>
+                        Contact Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                            <div class="relative">
+                                <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="email" name="email"
+                                       value="{{ participant.email or '' }}"
+                                       class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                       placeholder="player@email.com">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Phone</label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="tel" name="phone"
+                                       value="{{ participant.phone or '' }}"
+                                       class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                                       placeholder="+1234567890">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gaming Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-gamepad text-indigo-500 mr-2"></i>
+                        Gaming Platform
+                    </h3>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Platform</label>
+                        <select name="platform"
+                                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+                            <option value="">Select platform</option>
+                            <option value="PlayStation" {% if participant.platform == 'PlayStation' %}selected{% endif %}>PlayStation</option>
+                            <option value="Xbox" {% if participant.platform == 'Xbox' %}selected{% endif %}>Xbox</option>
+                            <option value="PC (Steam)" {% if participant.platform == 'PC (Steam)' %}selected{% endif %}>PC (Steam)</option>
+                            <option value="PC (Epic)" {% if participant.platform == 'PC (Epic)' %}selected{% endif %}>PC (Epic)</option>
+                            <option value="Mobile" {% if participant.platform == 'Mobile' %}selected{% endif %}>Mobile</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tournament Status -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black text-gray-900 flex items-center border-b border-gray-200 pb-3">
+                        <i class="fas fa-user-check text-green-500 mr-2"></i>
+                        Tournament Status
+                    </h3>
+                    
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0">
+                                    {% if participant.is_approved %}
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-green-600 text-xl"></i>
+                                    </div>
+                                    {% else %}
+                                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-gray-700">Current Status</div>
+                                    <div class="flex items-center mt-1">
+                                        {% if participant.is_approved %}
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-800">
+                                            <i class="fas fa-check mr-2"></i>
+                                            Approved for Tournament
+                                        </span>
+                                        {% else %}
+                                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800">
+                                            <i class="fas fa-clock mr-2"></i>
+                                            Pending Approval
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="is_approved" 
+                                           {% if participant.is_approved %}checked{% endif %}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                                    <span class="ml-3 text-sm font-bold text-gray-700">Tournament Approved</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-8 border-t-2 border-green-100">
+                    <a href="{{ url_for('tournament.participants', tournament_id=tournament.id) }}" 
+                       class="inline-flex items-center px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Participants
+                    </a>
+                    
+                    <div class="flex space-x-4">
+                        <button type="button" onclick="showDeleteModal()" 
+                                class="inline-flex items-center px-5 py-3 bg-red-50 text-red-700 hover:bg-red-100 text-sm font-bold rounded-lg transition-colors border border-red-200">
+                            <i class="fas fa-trash mr-2"></i>
+                            Remove Player
+                        </button>
+                        
+                        <button type="submit" 
+                                class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 backdrop-blur-sm">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-red-100">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-black text-gray-900 flex items-center">
+                        <i class="fas fa-exclamation-triangle text-red-600 mr-3"></i>
+                        Remove Participant
+                    </h3>
+                    <button onclick="closeDeleteModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="bg-red-50 rounded-xl p-4 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-warning text-red-500 text-xl mr-3"></i>
+                            <div>
+                                <h4 class="font-bold text-red-800 mb-1">This action cannot be undone</h4>
+                                <p class="text-red-700 text-sm">The participant will be permanently removed from the tournament and all their matches.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Participant Preview -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                <span class="text-white font-bold">{{ participant.name[:2]|upper }}</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900">{{ participant.name }}</div>
+                                {% if participant.gamer_tag %}
+                                <div class="text-sm text-gray-600">@{{ participant.gamer_tag }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeDeleteModal()" 
+                            class="px-6 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="confirmDelete()" 
+                            class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-2.5 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                        <i class="fas fa-trash mr-2"></i>Remove Participant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form submission with loading states
+document.getElementById('editParticipantForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving Changes...';
+    
+    const formData = new FormData(this);
+    
+    fetch(`{{ url_for('tournament.update_participant', tournament_id=tournament.id, participant_id=participant.id) }}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        
+        if (data.success) {
+            // Show success state briefly
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Saved!';
+            submitBtn.classList.remove('from-green-600', 'to-green-500');
+            submitBtn.classList.add('from-green-600', 'to-green-500');
+            
+            setTimeout(() => {
+                window.location.href = '{{ url_for("tournament.participants", tournament_id=tournament.id) }}';
+            }, 1000);
+        } else {
+            alert('❌ Error: ' + (data.error || 'Failed to update participant'));
+        }
+    })
+    .catch(error => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        console.error('Error:', error);
+        alert('❌ Failed to update participant');
+    });
+});
+
+// Delete modal functions
+function showDeleteModal() {
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteConfirmModal').classList.add('hidden');
+}
+
+function confirmDelete() {
+    const deleteBtn = document.querySelector('#deleteConfirmModal button[onclick="confirmDelete()"]');
+    const originalText = deleteBtn.innerHTML;
+    
+    // Show loading state
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Removing...';
+    
+    fetch(`{{ url_for('tournament.remove_participant', tournament_id=tournament.id, participant_id=participant.id) }}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = originalText;
+        
+        if (data.success) {
+            closeDeleteModal();
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            successDiv.innerHTML = '<i class="fas fa-check mr-2"></i>Participant removed successfully!';
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+                window.location.href = '{{ url_for("tournament.participants", tournament_id=tournament.id) }}';
+            }, 1500);
+        } else {
+            alert('❌ Error: ' + (data.error || 'Failed to remove player'));
+        }
+    })
+    .catch(error => {
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = originalText;
+        console.error('Error:', error);
+        alert('❌ Failed to remove player');
+    });
+}
+
+// Enhanced toggle switch behavior
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.querySelector('input[name="is_approved"]');
+    const statusDisplay = document.querySelector('.inline-flex.items-center.px-3');
+    const statusIcon = document.querySelector('.w-12.h-12');
+    
+    if (checkbox && statusDisplay && statusIcon) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                statusDisplay.className = 'inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-100 text-green-800';
+                statusDisplay.innerHTML = '<i class="fas fa-check mr-2"></i>Approved for Tournament';
+                statusIcon.className = 'w-12 h-12 bg-green-100 rounded-full flex items-center justify-center';
+                statusIcon.innerHTML = '<i class="fas fa-check text-green-600 text-xl"></i>';
+            } else {
+                statusDisplay.className = 'inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800';
+                statusDisplay.innerHTML = '<i class="fas fa-clock mr-2"></i>Pending Approval';
+                statusIcon.className = 'w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center';
+                statusIcon.innerHTML = '<i class="fas fa-clock text-yellow-600 text-xl"></i>';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

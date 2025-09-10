@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block title %}Register for {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<style>
+    /* Enhanced gradient backgrounds */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23fff' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+    }
+    
+    /* Feature card styling */
+    .feature-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 50px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Enhanced form inputs */
+    .form-input {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 2px solid #e5e7eb;
+    }
+    
+    .form-input:hover {
+        border-color: #d1d5db;
+        background: #ffffff;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        transform: translateY(-1px);
+        background: #ffffff;
+    }
+    
+    /* Gradient text */
+    .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Enhanced buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #fbbf24, #f59e0b, #10b981, #34d399);
+        border-radius: inherit;
+        z-index: -1;
+        filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .btn-primary:hover::before {
+        opacity: 0.7;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Modern Tournament Header -->
+    <div class="hero-gradient relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Enhanced Breadcrumbs -->
+            <nav class="flex mb-8 animate-fade-in" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <a href="{{ url_for('main.index') }}" class="text-green-600 hover:text-green-700 text-sm transition-colors">
+                            <i class="fas fa-home"></i>
+                            <span class="sr-only">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <a href="{{ url_for('main.explore') }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">Explore</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <a href="{{ url_for('main.tournament_details', tournament_id=tournament.id) }}" class="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">{{ tournament.name }}</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <span class="text-sm font-bold text-gray-900">Register</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Enhanced Tournament Title Section -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-green-100">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between">
+                    <div class="flex items-center space-x-6 mb-6 lg:mb-0">
+                        <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-user-plus text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-black gradient-text mb-2">Register for Tournament</h1>
+                            <h2 class="text-xl font-bold text-gray-900 mb-3">{{ tournament.name }}</h2>
+                            <div class="flex flex-wrap items-center gap-4 text-sm">
+                                <span class="flex items-center text-gray-600">
+                                    <i class="fas fa-calendar text-green-500 mr-2"></i>
+                                    {% if tournament.start_date %}
+                                        {% if tournament.start_date is string %}
+                                            {{ tournament.start_date[:10] }}
+                                        {% else %}
+                                            {{ tournament.start_date.strftime('%B %d, %Y') }}
+                                        {% endif %}
+                                    {% else %}
+                                        TBD
+                                    {% endif %}
+                                </span>
+                                <span class="flex items-center text-gray-600">
+                                    <i class="fas fa-gamepad text-green-500 mr-2"></i>
+                                    Football {{ tournament.type|title }}
+                                </span>
+                                <span class="flex items-center text-gray-600">
+                                    <i class="fas fa-sitemap text-green-500 mr-2"></i>
+                                    {{ tournament.format|replace('_', ' ')|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="text-center bg-green-50 p-4 rounded-xl border border-green-100">
+                            <div class="text-2xl font-black text-green-600">{{ tournament.type|title }}</div>
+                            <div class="text-green-700 text-xs font-medium">Tournament Type</div>
+                        </div>
+                        <div class="text-center bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <div class="text-2xl font-black text-blue-600">{{ registered_count or 0 }}</div>
+                            <div class="text-blue-700 text-xs font-medium">Registered</div>
+                        </div>
+                        <div class="text-center bg-purple-50 p-4 rounded-xl border border-purple-100">
+                            <div class="text-2xl font-black text-purple-600">
+                                {% if capacity_max %}{{ capacity_max }}{% else %}∞{% endif %}
+                            </div>
+                            <div class="text-purple-700 text-xs font-medium">
+                                {% if tournament.type == 'solo' %}Max Participants{% else %}Max Teams{% endif %}
+                            </div>
+                        </div>
+                        <div class="text-center bg-amber-50 p-4 rounded-xl border border-amber-100">
+                            <div class="text-2xl font-black text-amber-600">
+                                {% if tournament.entry_fee %}${{ tournament.entry_fee }}{% else %}Free{% endif %}
+                            </div>
+                            <div class="text-amber-700 text-xs font-medium">Entry Fee</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Registration Form -->
+        <div class="feature-card rounded-2xl shadow-xl overflow-hidden border border-green-100">
+            <div class="px-8 py-6 bg-gradient-to-r from-green-50 to-green-100 border-b border-green-200">
+                <div class="flex items-center mb-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
+                        <i class="fas fa-user-plus text-white text-lg"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900">
+                        {% if tournament.type == 'solo' %}
+                            Player Registration
+                        {% else %}
+                            Team Registration
+                        {% endif %}
+                    </h2>
+                </div>
+                <p class="text-green-700 ml-13">
+                    {% if tournament.type == 'solo' %}
+                        Register as an individual player to compete in this Football tournament.
+                    {% else %}
+                        Register your team to compete in this Football tournament.
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Error Display -->
+            {% if error %}
+            <div class="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-6 m-6 rounded-xl">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-exclamation-triangle text-white text-sm"></i>
+                    </div>
+                    <div class="text-red-800">
+                        <p class="font-bold">Registration Error</p>
+                        <p class="text-sm mt-1">{{ error }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" class="p-8" x-data="registrationForm()" @submit="handleSubmit">
+                {% if tournament.type == 'solo' %}
+                    <!-- Solo Tournament Registration -->
+                    <div class="space-y-8">
+                        <!-- Personal Information Section -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                            <div class="flex items-center mb-6">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-gray-900">Personal Information</h3>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Name -->
+                                <div>
+                                    <label for="name" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-id-badge text-green-500 mr-2"></i>
+                                        Full Name *
+                                    </label>
+                                    <input type="text" 
+                                           id="name" 
+                                           name="name" 
+                                           required
+                                           x-model="form.name"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter your full name">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">Your display name in the tournament</p>
+                                </div>
+
+                                <!-- Email -->
+                                <div>
+                                    <label for="email" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-envelope text-green-500 mr-2"></i>
+                                        Email Address *
+                                    </label>
+                                    <input type="email" 
+                                           id="email" 
+                                           name="email" 
+                                           required
+                                           x-model="form.email"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter your email address">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">For tournament updates and communication</p>
+                                </div>
+
+                                <!-- Phone -->
+                                <div>
+                                    <label for="phone" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-phone text-green-500 mr-2"></i>
+                                        Phone Number
+                                    </label>
+                                    <input type="tel" 
+                                           id="phone" 
+                                           name="phone"
+                                           x-model="form.phone"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter your phone number">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">Optional - for urgent tournament communications</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gaming Information Section -->
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+                            <div class="flex items-center mb-6">
+                                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-trophy text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-gray-900">Gaming Information</h3>
+                            </div>
+                            
+                            <!-- Skill Level -->
+                            <div>
+                                <label for="skill_level" class="block text-sm font-bold text-gray-800 mb-3">
+                                    <i class="fas fa-chart-line text-green-500 mr-2"></i>
+                                    Skill Level
+                                </label>
+                                <select id="skill_level" 
+                                        name="skill_level"
+                                        x-model="form.skill_level"
+                                        class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium">
+                                    <option value="beginner">Beginner - Just starting with Football</option>
+                                    <option value="intermediate">Intermediate - Regular player with some experience</option>
+                                    <option value="advanced">Advanced - Experienced competitive player</option>
+                                    <option value="expert">Expert - Professional or semi-professional level</option>
+                                </select>
+                                <p class="mt-2 text-xs text-gray-600 ml-6">Help us create balanced matches and appropriate brackets</p>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <!-- Team Tournament Registration -->
+                    <div class="space-y-8">
+                        <!-- Team Information Section -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                            <div class="flex items-center mb-6">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-users text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-gray-900">Team Information</h3>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Team Name -->
+                                <div>
+                                    <label for="team_name" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-flag text-green-500 mr-2"></i>
+                                        Team Name *
+                                    </label>
+                                    <input type="text" 
+                                           id="team_name" 
+                                           name="team_name" 
+                                           required
+                                           x-model="form.team_name"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter your team name">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">Full name of your Football team</p>
+                                </div>
+
+                                <!-- Short Name -->
+                                <div>
+                                    <label for="short_name" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-tag text-green-500 mr-2"></i>
+                                        Short Name / Tag
+                                    </label>
+                                    <input type="text" 
+                                           id="short_name" 
+                                           name="short_name"
+                                           x-model="form.short_name"
+                                           maxlength="8"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="e.g., FC, UTD, ACM">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">Short tag for brackets and displays (max 8 characters)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Captain Section -->
+                        <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-6 border border-green-200">
+                            <div class="flex items-center mb-6">
+                                <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-user-tie text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-gray-900">Team Captain & Contact</h3>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Captain Name -->
+                                <div>
+                                    <label for="captain_name" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-crown text-green-500 mr-2"></i>
+                                        Team Captain *
+                                    </label>
+                                    <input type="text" 
+                                           id="captain_name" 
+                                           name="captain_name" 
+                                           required
+                                           x-model="form.captain_name"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter captain's full name">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">Primary contact and team representative</p>
+                                </div>
+
+                                <!-- Email -->
+                                <div>
+                                    <label for="email" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-envelope text-green-500 mr-2"></i>
+                                        Contact Email *
+                                    </label>
+                                    <input type="email" 
+                                           id="email" 
+                                           name="email" 
+                                           required
+                                           x-model="form.email"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter team contact email">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">For tournament updates and team communication</p>
+                                </div>
+                                
+                                <!-- Phone -->
+                                <div class="md:col-span-2">
+                                    <label for="phone" class="block text-sm font-bold text-gray-800 mb-3">
+                                        <i class="fas fa-phone text-green-500 mr-2"></i>
+                                        Contact Phone Number
+                                    </label>
+                                    <input type="tel" 
+                                           id="phone" 
+                                           name="phone"
+                                           x-model="form.phone"
+                                           class="form-input w-full px-4 py-3 rounded-xl shadow-sm font-medium"
+                                           placeholder="Enter contact phone number">
+                                    <p class="mt-2 text-xs text-gray-600 ml-6">Optional - for urgent tournament communications</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Tournament Rules Agreement -->
+                <div class="mt-8 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-gavel text-white text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900">Tournament Rules & Agreement</h3>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <input type="checkbox" 
+                               id="agree_rules" 
+                               name="agree_rules" 
+                               required
+                               x-model="form.agreeRules"
+                               class="mt-1 h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <label for="agree_rules" class="text-sm text-gray-800">
+                            <span class="font-bold text-amber-800">I agree to the tournament rules and conditions *</span>
+                            <div class="text-amber-700 mt-2 space-y-1">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                                    <span>Follow fair play and sportsmanship guidelines</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                                    <span>Be available for matches during tournament period</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                                    <span>Respect other participants and organizers</span>
+                                </div>
+                                {% if tournament.entry_fee %}
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2 text-xs"></i>
+                                    <span>Complete payment of entry fee (${{ tournament.entry_fee }}) before tournament start</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button Section -->
+                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                    <button type="submit" 
+                            :disabled="!form.agreeRules || loading"
+                            :class="{ 'opacity-50 cursor-not-allowed': !form.agreeRules || loading }"
+                            class="btn-primary flex-1 text-white py-4 px-8 rounded-xl font-bold border border-transparent shadow-lg">
+                        <span x-show="!loading" class="flex items-center justify-center">
+                            <i class="fas fa-user-plus mr-3"></i>
+                            {% if tournament.type == 'solo' %}
+                                Register as Player
+                            {% else %}
+                                Register Team
+                            {% endif %}
+                        </span>
+                        <span x-show="loading" class="flex items-center justify-center">
+                            <i class="fas fa-spinner fa-spin mr-3"></i>
+                            Processing Registration...
+                        </span>
+                    </button>
+                    
+                    <a href="{{ url_for('main.tournament_details', tournament_id=tournament.id) }}" 
+                       class="flex-shrink-0 bg-white border-2 border-gray-300 text-gray-700 py-4 px-8 rounded-xl font-bold hover:bg-gray-50 hover:border-green-300 transition-all duration-200 hover:-translate-y-1 text-center shadow-sm hover:shadow-md">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Tournament
+                    </a>
+                </div>
+
+                <!-- Enhanced Additional Info -->
+                <div class="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-info-circle text-white text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-gray-900">What Happens Next?</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1 flex-shrink-0">
+                                <i class="fas fa-envelope text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-blue-900 text-sm">Confirmation Email</p>
+                                <p class="text-blue-800 text-xs mt-1">Instant confirmation with registration details</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center mt-1 flex-shrink-0">
+                                <i class="fas fa-calendar text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-blue-900 text-sm">Match Schedule</p>
+                                <p class="text-blue-800 text-xs mt-1">Tournament brackets sent 24-48 hours before start</p>
+                            </div>
+                        </div>
+                        
+                        {% if tournament.entry_fee %}
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center mt-1 flex-shrink-0">
+                                <i class="fas fa-credit-card text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-blue-900 text-sm">Payment Instructions</p>
+                                <p class="text-blue-800 text-xs mt-1">Entry fee payment details included in confirmation email</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if tournament.type == 'team' %}
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center mt-1 flex-shrink-0">
+                                <i class="fas fa-users-cog text-white text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-blue-900 text-sm">Team Management</p>
+                                <p class="text-blue-800 text-xs mt-1">Roster management links provided after registration</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function registrationForm() {
+    return {
+        loading: false,
+        form: {
+            {% if tournament.type == 'solo' %}
+            name: '',
+            email: '',
+            phone: '',
+            skill_level: 'beginner',
+            {% else %}
+            team_name: '',
+            short_name: '',
+            captain_name: '',
+            email: '',
+            phone: '',
+            {% endif %}
+            agreeRules: false
+        },
+        
+        handleSubmit(event) {
+            this.loading = true;
+            // Let the form submit naturally
+            return true;
+        }
+    }
+}
+</script>
+{% endblock %}

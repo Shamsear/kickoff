@@ -1,0 +1,1417 @@
+{% extends "base.html" %}
+
+{% block title %}Create Tournament - Kickoff Arena{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Hero gradient background matching index page */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        animation: float 20s infinite linear;
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 60%; right: 20%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { top: 40%; left: 80%; animation-delay: 4s; }
+    .floating-shape:nth-child(4) { bottom: 20%; left: 20%; animation-delay: 1s; }
+    .floating-shape:nth-child(5) { bottom: 40%; right: 10%; animation-delay: 3s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    /* Enhanced card styling matching explore page */
+    .feature-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Enhanced step indicator */
+    .step-indicator {
+        position: relative;
+    }
+    
+    /* Step connection line should only apply to steps 1-3, not the last step */
+    .step-indicator:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 20px; /* Align with center of circle */
+        left: 62%; /* Position line to start after the circle */
+        width: 76%; /* Length of line to next circle */
+        height: 3px;
+        background: linear-gradient(90deg, #e5e7eb, #d1d5db);
+        z-index: 1;
+        border-radius: 2px;
+    }
+    
+    .step-circle {
+        position: relative;
+        z-index: 2;
+        background: white;
+        border: 3px solid #e5e7eb;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .step-active .step-circle {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border-color: #10b981;
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.2);
+        transform: scale(1.1);
+    }
+    
+    .step-completed .step-circle {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border-color: #10b981;
+        transform: scale(1.05);
+    }
+    
+    /* Style completed connection lines */
+    .step-completed:not(:last-child)::after,
+    .step-active:not(:last-child)::after {
+        background: linear-gradient(90deg, #10b981, #059669);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Enhanced form section animations */
+    .form-section {
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .form-section.hidden {
+        opacity: 0;
+        transform: translateX(30px) scale(0.95);
+        pointer-events: none;
+        position: absolute;
+        left: -9999px;
+    }
+    
+    .form-section.active {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        pointer-events: all;
+        position: relative;
+        left: auto;
+    }
+    
+    /* Enhanced tournament type cards */
+    .tournament-type-card .tournament-type-option {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .tournament-type-card .tournament-type-option::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .tournament-type-card:hover .tournament-type-option::before {
+        left: 100%;
+    }
+    
+    .tournament-type-card input:checked + .tournament-type-option {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .tournament-type-card:hover .tournament-type-option {
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Enhanced input styling */
+    .form-input {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 2px solid #e5e7eb;
+    }
+    
+    .form-input:hover {
+        border-color: #d1d5db;
+        background: #ffffff;
+    }
+    
+    .form-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.15);
+        background: #ffffff;
+        border-color: #10b981;
+    }
+    
+    /* Enhanced progress bar */
+    .progress-fill {
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+    
+    /* Gradient text matching index page */
+    .gradient-text {
+        background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Enhanced buttons matching design system */
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #fbbf24, #f59e0b, #10b981, #34d399);
+        border-radius: inherit;
+        z-index: -1;
+        filter: blur(8px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .btn-primary:hover::before {
+        opacity: 0.7;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Pulse animation for live elements */
+    .pulse-ring {
+        animation: pulseRing 2s ease-out infinite;
+    }
+    
+    @keyframes pulseRing {
+        0% {
+            transform: scale(0.33);
+            opacity: 1;
+        }
+        80%, 100% {
+            opacity: 0;
+            transform: scale(2.5);
+        }
+    }
+    
+    /* Scroll reveal animations */
+    .scroll-reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.6s ease;
+    }
+    
+    .scroll-reveal.revealed {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Enhanced review section styling */
+    .review-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 2px solid rgba(16, 185, 129, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .review-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Animate on entry */
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Success checkmarks animation */
+    .success-checkmark {
+        animation: checkmark 0.6s ease-out;
+    }
+    
+    @keyframes checkmark {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Compact Header -->
+        <div class="mb-8">
+            <!-- Breadcrumbs -->
+            <nav class="flex mb-6 animate-fadeIn" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <a href="{{ url_for('main.index') }}" class="text-gray-500 hover:text-green-600 text-sm transition-colors">
+                            <i class="fas fa-home"></i>
+                            <span class="sr-only">Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <a href="{{ url_for('main.dashboard') }}" class="text-sm font-medium text-gray-500 hover:text-green-600 transition-colors">Dashboard</a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-300 text-sm mr-4"></i>
+                            <span class="text-sm font-semibold text-gray-900">Create Tournament</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Focused Header -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                        <i class="fas fa-plus text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black text-gray-900">Create Tournament</h1>
+                        <p class="text-gray-600 text-sm">Set up your tournament in 4 simple steps</p>
+                    </div>
+                </div>
+                <div class="hidden lg:flex items-center bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-bold border border-green-200">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Guided Setup
+                </div>
+            </div>
+        </div>
+        <!-- Fixed Progress Indicator -->
+        <div class="feature-card rounded-2xl shadow-xl p-6 sm:p-8 mb-8 border border-green-100 animate-fadeIn">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                <div class="flex items-center mb-4 sm:mb-0">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3 shadow-md">
+                        <i class="fas fa-tasks text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Setup Progress</h2>
+                        <p class="text-sm text-gray-500">Complete each step to create your tournament</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-green-50 to-teal-50 px-4 py-2 rounded-xl border border-green-200">
+                    <span class="text-sm font-bold text-green-800">Step <span id="current-step" class="text-lg">1</span> of 4</span>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-8 overflow-hidden">
+                <div class="progress-fill h-2 rounded-full transition-all duration-500 ease-out" style="width: 25%" id="progress-bar"></div>
+            </div>
+            
+            <!-- Step Indicators -->
+            <div class="grid grid-cols-4 gap-2 sm:gap-4">
+                <div class="step-indicator step-active flex flex-col items-center text-center">
+                    <div class="step-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold mb-2 relative">
+                        1
+                    </div>
+                    <div>
+                        <span class="text-xs sm:text-sm font-semibold text-gray-900 block leading-tight">Basic Info</span>
+                        <span class="text-xs text-gray-500 hidden sm:block">Details</span>
+                    </div>
+                </div>
+                
+                <div class="step-indicator flex flex-col items-center text-center">
+                    <div class="step-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold mb-2 relative">
+                        2
+                    </div>
+                    <div>
+                        <span class="text-xs sm:text-sm font-semibold text-gray-900 block leading-tight">Schedule</span>
+                        <span class="text-xs text-gray-500 hidden sm:block">Dates & Limits</span>
+                    </div>
+                </div>
+                
+                <div class="step-indicator flex flex-col items-center text-center">
+                    <div class="step-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold mb-2 relative">
+                        3
+                    </div>
+                    <div>
+                        <span class="text-xs sm:text-sm font-semibold text-gray-900 block leading-tight">Prize & Rules</span>
+                        <span class="text-xs text-gray-500 hidden sm:block">Settings</span>
+                    </div>
+                </div>
+                
+                <div class="step-indicator flex flex-col items-center text-center">
+                    <div class="step-circle w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-bold mb-2 relative">
+                        4
+                    </div>
+                    <div>
+                        <span class="text-xs sm:text-sm font-semibold text-gray-900 block leading-tight">Review</span>
+                        <span class="text-xs text-gray-500 hidden sm:block">Final Check</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" class="space-y-8" id="tournament-form">
+        <!-- Step 1: Basic Information -->
+        <div class="form-section active scroll-reveal" id="step-1">
+            <div class="feature-card rounded-2xl shadow-xl p-10 border border-green-100">
+                <div class="border-b-2 border-gray-100 pb-8 mb-10">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
+                                <i class="fas fa-info-circle text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-black text-gray-900">Basic Information</h2>
+                                <p class="text-gray-600 mt-1 font-medium">Essential details about your tournament</p>
+                            </div>
+                        </div>
+                        <div class="hidden sm:flex items-center bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-bold border border-green-200">
+                            <i class="fas fa-clock mr-2"></i>
+                            ~2 minutes
+                        </div>
+                    </div>
+                </div>
+                
+                    <!-- Tournament Type Selection -->
+                    <div class="mb-8">
+                        <label class="block text-lg font-medium text-gray-800 mb-6">
+                            Tournament Type *
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <label class="tournament-type-card">
+                                <input type="radio" name="tournament_type" value="solo" class="sr-only" required>
+                                <div class="tournament-type-option bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-2xl p-8 cursor-pointer hover:from-blue-100 hover:to-indigo-200 transition-all duration-300">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-user text-white text-xl"></i>
+                                        </div>
+                                        <div class="w-7 h-7 border-2 border-blue-500 rounded-full flex items-center justify-center">
+                                            <div class="w-4 h-4 bg-blue-500 rounded-full hidden"></div>
+                                        </div>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-3">Solo Tournament</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Individual players compete against each other in 1v1 matches</p>
+                                    <ul class="text-xs text-gray-500 space-y-2">
+                                        <li class="flex items-center"><i class="fas fa-check text-blue-500 mr-2"></i>Player vs Player matches</li>
+                                        <li class="flex items-center"><i class="fas fa-check text-blue-500 mr-2"></i>Individual leaderboards</li>
+                                        <li class="flex items-center"><i class="fas fa-check text-blue-500 mr-2"></i>Personal statistics</li>
+                                    </ul>
+                                </div>
+                            </label>
+                            
+                            <label class="tournament-type-card">
+                                <input type="radio" name="tournament_type" value="team" class="sr-only" required>
+                                <div class="tournament-type-option bg-gradient-to-br from-green-50 to-teal-100 border-2 border-green-200 rounded-2xl p-8 cursor-pointer hover:from-green-100 hover:to-teal-200 transition-all duration-300">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-users text-white text-xl"></i>
+                                        </div>
+                                        <div class="w-7 h-7 border-2 border-green-500 rounded-full flex items-center justify-center">
+                                            <div class="w-4 h-4 bg-green-500 rounded-full hidden"></div>
+                                        </div>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-3">Team Tournament</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Teams with multiple players compete against other teams</p>
+                                    <ul class="text-xs text-gray-500 space-y-2">
+                                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Team vs Team matches</li>
+                                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Multiple players per team</li>
+                                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Team rosters & management</li>
+                                    </ul>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-trophy text-white text-xs"></i>
+                                </div>
+                                Tournament Name *
+                            </label>
+                            <input type="text" name="name" id="name" required
+                                   class="form-input w-full px-6 py-5 text-lg font-medium rounded-2xl"
+                                   placeholder="e.g., Summer Football Championship 2024">
+                            <p class="text-xs text-gray-500 mt-2 ml-9">Choose a memorable and descriptive name</p>
+                        </div>
+                        
+                        <div>
+                            <label for="sport" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-gamepad text-white text-xs"></i>
+                                </div>
+                                Game *
+                            </label>
+                            <select name="sport" id="sport" required class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                                <option value="">Select a game</option>
+                                <option value="pes" selected>🏆 Football (Recommended)</option>
+                                <option value="fifa">⚽ FIFA</option>
+                                <option value="pes_legacy">📱 PES (Legacy)</option>
+                                <option value="other_sports">🎮 Other Sports Games</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-2 ml-9">Primary focus: Football tournaments</p>
+                        </div>
+                        
+                        <div>
+                            <label for="format" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                <div class="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-sitemap text-white text-xs"></i>
+                                </div>
+                                Tournament Format *
+                            </label>
+                            <select name="format" id="format" required class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                                <option value="">Select format</option>
+                                <option value="single_elimination">🏆 Single Elimination (Fast)</option>
+                                <option value="double_elimination">🥇 Double Elimination (Fair)</option>
+                                <option value="round_robin">⚽ Round Robin (Everyone plays)</option>
+                                <option value="group_stage">📊 Group Stage (Professional)</option>
+                                <option value="swiss">🎯 Swiss System (Balanced)</option>
+                                <option value="knockout">⚡ Knockout (Quick)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="description" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                            <div class="w-6 h-6 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-file-text text-white text-xs"></i>
+                            </div>
+                            Tournament Description
+                        </label>
+                        <textarea name="description" id="description" rows="8"
+                                  class="form-input w-full px-6 py-5 text-lg rounded-2xl resize-none"
+                                  placeholder="Describe your tournament...&#10;&#10;• What makes it special?&#10;• Who should participate?&#10;• Any special rules or themes?&#10;• Prizes or rewards?"></textarea>
+                        <p class="text-xs text-gray-500 mt-2 ml-9">Help players understand what your tournament is about</p>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Navigation Buttons -->
+                <div class="flex justify-between items-center pt-8 border-t-2 border-gray-100 mt-10">
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-lightbulb mr-1 text-yellow-500"></i>
+                        Tip: Choose a unique name that represents your tournament theme
+                    </div>
+                    <button type="button" id="next-step-1" class="btn-primary text-white px-10 py-4 rounded-2xl text-lg font-black shadow-xl transform transition-all duration-300 hover:-translate-y-1">
+                        Continue to Schedule <i class="fas fa-arrow-right ml-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+            
+        <!-- Step 2: Schedule & Limits -->
+        <div class="form-section hidden scroll-reveal" id="step-2">
+            <div class="feature-card rounded-2xl shadow-xl p-10 border border-green-100">
+                <div class="border-b-2 border-gray-100 pb-8 mb-10">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
+                                <i class="fas fa-calendar-alt text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-black text-gray-900">Schedule & Limits</h2>
+                                <p class="text-gray-600 mt-1 font-medium">Set dates and participation limits</p>
+                            </div>
+                        </div>
+                        <div class="hidden sm:flex items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-bold border border-blue-200">
+                            <i class="fas fa-clock mr-2"></i>
+                            ~1 minute
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div>
+                        <label for="start_date" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                            <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-play text-white text-xs"></i>
+                            </div>
+                            Tournament Start Date
+                        </label>
+                        <input type="date" name="start_date" id="start_date"
+                               class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                        <p class="text-xs text-gray-500 mt-2 ml-9">When does your tournament begin?</p>
+                    </div>
+                    
+                    <div>
+                        <label for="end_date" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                            <div class="w-6 h-6 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-stop text-white text-xs"></i>
+                            </div>
+                            Tournament End Date
+                        </label>
+                        <input type="date" name="end_date" id="end_date"
+                               class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                        <p class="text-xs text-gray-500 mt-2 ml-9">Final day of tournament</p>
+                    </div>
+                    
+                    <div>
+                        <label for="registration_deadline" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                            <div class="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-user-plus text-white text-xs"></i>
+                            </div>
+                            Registration Deadline
+                        </label>
+                        <input type="date" name="registration_deadline" id="registration_deadline"
+                               class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                        <p class="text-xs text-gray-500 mt-2 ml-9">Last day to join tournament</p>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Participant Limits -->
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-8 border border-gray-200">
+                    <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        Participation Settings
+                    </h3>
+                    
+                    <!-- Solo Tournament Fields -->
+                    <div id="solo_fields" class="hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <label for="max_participants" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-user text-white text-xs"></i>
+                                    </div>
+                                    Maximum Participants
+                                </label>
+                                <input type="number" name="max_participants" id="max_participants" min="2" max="256" value="32"
+                                       class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                                <p class="text-xs text-gray-500 mt-2 ml-9">Individual players competing 1v1 (2-256)</p>
+                            </div>
+                            <div>
+                                <label for="location" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-map-marker-alt text-white text-xs"></i>
+                                    </div>
+                                    Tournament Location
+                                </label>
+                                <input type="text" name="location" id="location"
+                                       class="form-input w-full px-6 py-5 text-lg rounded-2xl"
+                                       placeholder="e.g., Online, New York Gaming Center">
+                                <p class="text-xs text-gray-500 mt-2 ml-9">Where will matches be played?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Tournament Fields -->
+                    <div id="team_fields" class="hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                            <div>
+                                <label for="max_teams" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-users text-white text-xs"></i>
+                                    </div>
+                                    Maximum Teams
+                                </label>
+                                <input type="number" name="max_teams" id="max_teams" min="2" max="64" value="16"
+                                       class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                                <p class="text-xs text-gray-500 mt-2 ml-9">Teams competing (2-64)</p>
+                            </div>
+                            
+                            <div>
+                                <label for="max_players_per_team" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-user-friends text-white text-xs"></i>
+                                    </div>
+                                    Players per Team
+                                </label>
+                                <input type="number" name="max_players_per_team" id="max_players_per_team" min="2" max="20" value="5"
+                                       class="form-input w-full px-6 py-5 text-lg rounded-2xl">
+                                <p class="text-xs text-gray-500 mt-2 ml-9">Real people per team (2-20)</p>
+                            </div>
+                            
+                            <div>
+                                <label for="team_location" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg flex items-center justify-center mr-3">
+                                        <i class="fas fa-map-marker-alt text-white text-xs"></i>
+                                    </div>
+                                    Tournament Location
+                                </label>
+                                <input type="text" name="location" id="team_location"
+                                       class="form-input w-full px-6 py-5 text-lg rounded-2xl"
+                                       placeholder="e.g., Online, Gaming Arena">
+                                <p class="text-xs text-gray-500 mt-2 ml-9">Where will matches be played?</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Team Scoring System Selection -->
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+                            <h4 class="text-lg font-black text-gray-900 mb-6 flex items-center">
+                                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-calculator text-white text-sm"></i>
+                                </div>
+                                Team Scoring System *
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <label class="tournament-type-card cursor-pointer">
+                                    <input type="radio" name="scoring_system" value="goal_based" class="sr-only" required>
+                                    <div class="tournament-type-option bg-gradient-to-br from-orange-50 to-red-100 border-2 border-orange-200 rounded-xl p-6 hover:from-orange-100 hover:to-red-200 transition-all duration-300">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-futbol text-white"></i>
+                                            </div>
+                                            <div class="w-6 h-6 border-2 border-orange-500 rounded-full flex items-center justify-center">
+                                                <div class="w-3 h-3 bg-orange-500 rounded-full hidden"></div>
+                                            </div>
+                                        </div>
+                                        <h5 class="text-lg font-bold text-gray-900 mb-2">Goal-Based</h5>
+                                        <p class="text-sm text-gray-600 mb-3">Team wins by scoring the most goals total across all matches</p>
+                                        <ul class="text-xs text-gray-500 space-y-1">
+                                            <li class="flex items-center"><i class="fas fa-check text-orange-500 mr-2"></i>Total goals determine winner</li>
+                                            <li class="flex items-center"><i class="fas fa-check text-orange-500 mr-2"></i>Players contribute to team score</li>
+                                            <li class="flex items-center"><i class="fas fa-check text-orange-500 mr-2"></i>Encourages attacking play</li>
+                                        </ul>
+                                    </div>
+                                </label>
+                                
+                                <label class="tournament-type-card cursor-pointer">
+                                    <input type="radio" name="scoring_system" value="win_based" class="sr-only" required>
+                                    <div class="tournament-type-option bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-200 rounded-xl p-6 hover:from-blue-100 hover:to-indigo-200 transition-all duration-300">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-trophy text-white"></i>
+                                            </div>
+                                            <div class="w-6 h-6 border-2 border-blue-500 rounded-full flex items-center justify-center">
+                                                <div class="w-3 h-3 bg-blue-500 rounded-full hidden"></div>
+                                            </div>
+                                        </div>
+                                        <h5 class="text-lg font-bold text-gray-900 mb-2">Win-Based</h5>
+                                        <p class="text-sm text-gray-600 mb-3">Traditional points system: 3 points for win, 1 for draw</p>
+                                        <ul class="text-xs text-gray-500 space-y-1">
+                                            <li class="flex items-center"><i class="fas fa-check text-blue-500 mr-2"></i>3 points per win, 1 per draw</li>
+                                            <li class="flex items-center"><i class="fas fa-check text-blue-500 mr-2"></i>Most points wins tournament</li>
+                                            <li class="flex items-center"><i class="fas fa-check text-blue-500 mr-2"></i>Classic tournament format</li>
+                                        </ul>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Navigation Buttons -->
+                <div class="flex justify-between items-center pt-8 border-t-2 border-gray-100 mt-10">
+                    <button type="button" id="prev-step-2" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+                        <i class="fas fa-arrow-left mr-3"></i> Back to Basic Info
+                    </button>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-lightbulb mr-1 text-yellow-500"></i>
+                        Tip: Leave dates empty for "TBD" (To Be Determined) tournaments
+                    </div>
+                    <button type="button" id="next-step-2" class="btn-primary text-white px-10 py-4 rounded-2xl text-lg font-black shadow-xl transform transition-all duration-300 hover:-translate-y-1">
+                        Continue to Prizes <i class="fas fa-arrow-right ml-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Prize & Rules -->
+        <div class="form-section hidden scroll-reveal" id="step-3">
+            <div class="feature-card rounded-2xl shadow-xl p-10 border border-green-100">
+                <div class="border-b-2 border-gray-100 pb-8 mb-10">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
+                                <i class="fas fa-trophy text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-black text-gray-900">Prizes & Rules</h2>
+                                <p class="text-gray-600 mt-1 font-medium">Set entry fees, prizes, and tournament rules</p>
+                            </div>
+                        </div>
+                        <div class="hidden sm:flex items-center bg-yellow-50 text-yellow-700 px-4 py-2 rounded-full text-sm font-bold border border-yellow-200">
+                            <i class="fas fa-star mr-2"></i>
+                            Optional
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Prize & Entry Section -->
+                <div class="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-8 border border-yellow-200 mb-10">
+                    <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-dollar-sign text-white"></i>
+                        </div>
+                        Prize & Entry Fees
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <label for="entry_fee" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                <div class="w-6 h-6 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-ticket-alt text-white text-xs"></i>
+                                </div>
+                                Entry Fee (USD $)
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg font-bold">$</span>
+                                <input type="number" name="entry_fee" id="entry_fee" min="0" step="0.01" value="0"
+                                       class="form-input w-full pl-12 pr-6 py-5 text-lg font-bold rounded-2xl">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 ml-9">Set to $0 for completely free tournaments</p>
+                        </div>
+                        
+                        <div>
+                            <label for="prize_pool" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                <div class="w-6 h-6 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-trophy text-white text-xs"></i>
+                                </div>
+                                Total Prize Pool (USD $)
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg font-bold">$</span>
+                                <input type="number" name="prize_pool" id="prize_pool" min="0" step="0.01" value="0"
+                                       class="form-input w-full pl-12 pr-6 py-5 text-lg font-bold rounded-2xl">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 ml-9">Total amount distributed to winners</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Rules & Settings Section -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
+                    <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-gavel text-white"></i>
+                        </div>
+                        Rules & Settings
+                    </h3>
+                    <div class="space-y-8">
+                        <div>
+                            <label for="rules" class="block text-sm font-bold text-gray-800 mb-4 flex items-center">
+                                <div class="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-list-ul text-white text-xs"></i>
+                                </div>
+                                Tournament Rules & Guidelines
+                            </label>
+                            <textarea name="rules" id="rules" rows="8"
+                                      class="form-input w-full px-6 py-5 text-lg rounded-2xl resize-none"
+                                      placeholder="Define your tournament rules...&#10;&#10;Example rules:&#10;• All matches must be completed within 24 hours&#10;• No pausing during matches except for technical issues&#10;• Players must use default camera settings&#10;• Disconnections: Winner determined by current score&#10;• Disputes resolved by tournament admin"></textarea>
+                            <p class="text-xs text-gray-500 mt-2 ml-9">Clear rules help prevent disputes and ensure fair play</p>
+                        </div>
+                        
+                        <div class="bg-white border-2 border-green-200 rounded-2xl p-6">
+                            <div class="flex items-start">
+                                <input type="checkbox" name="is_public" id="is_public" checked
+                                       class="h-6 w-6 text-green-600 focus:ring-green-500 border-gray-300 rounded-lg mt-1">
+                                <div class="ml-4">
+                                    <label for="is_public" class="block text-lg font-bold text-gray-900 mb-2">
+                                        <i class="fas fa-globe mr-2 text-green-600"></i>Make Tournament Public
+                                    </label>
+                                    <p class="text-sm text-gray-600">Public tournaments appear in search results and can be discovered by anyone. Private tournaments are only accessible via direct links.</p>
+                                    <div class="mt-3 text-xs text-green-600 font-medium">
+                                        <i class="fas fa-check-circle mr-1"></i>Recommended for better visibility and participation
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Navigation Buttons -->
+                <div class="flex justify-between items-center pt-8 border-t-2 border-gray-100 mt-10">
+                    <button type="button" id="prev-step-3" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-2xl text-lg font-bold hover:bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg">
+                        <i class="fas fa-arrow-left mr-3"></i> Back to Schedule
+                    </button>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-lightbulb mr-1 text-yellow-500"></i>
+                        Tip: Clear rules prevent disputes and create better tournaments
+                    </div>
+                    <button type="button" id="next-step-3" class="btn-primary text-white px-10 py-4 rounded-2xl text-lg font-black shadow-xl transform transition-all duration-300 hover:-translate-y-1">
+                        Review & Create <i class="fas fa-eye ml-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+            
+        <!-- Step 4: Review & Submit -->
+            <div class="form-section hidden" id="step-4">
+                <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
+                    <div class="border-b border-gray-200 pb-6 mb-8">
+                        <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-3"></i>Review & Submit
+                        </h2>
+                        <p class="text-gray-600 mt-2">Review your tournament details before creating</p>
+                    </div>
+                    
+                    <!-- Tournament Summary -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 rounded-xl p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                                <dl class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Name:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-name">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Type:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-type">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Game:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-game">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Format:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-format">-</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-xl p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Schedule</h3>
+                                <dl class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Start Date:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-start-date">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">End Date:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-end-date">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Registration:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-reg-deadline">-</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 rounded-xl p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Participants</h3>
+                                <dl class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Max Participants:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-participants">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Location:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-location">-</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-xl p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Prize & Entry</h3>
+                                <dl class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Entry Fee:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-entry-fee">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Prize Pool:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-prize-pool">-</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-gray-600">Visibility:</dt>
+                                        <dd class="text-sm font-medium text-gray-900" id="review-visibility">-</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Save as Draft Option -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="save_as_draft" class="h-5 w-5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                            <label for="save_as_draft" class="ml-3 block text-sm font-medium text-amber-800">
+                                <i class="fas fa-file-alt mr-2"></i>Save as draft (you can complete setup later)
+                            </label>
+                        </div>
+                        <p class="text-xs text-amber-600 mt-2 ml-8">Drafts can be edited and published later from your dashboard</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0 pt-6 border-t border-gray-200">
+                        <button type="button" id="prev-step-4" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i> Previous
+                        </button>
+                        
+                        <div class="flex space-x-4">
+                            <a href="{{ url_for('main.dashboard') }}" 
+                               class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </a>
+                            <button type="submit" id="create-btn"
+                                    class="inline-flex items-center px-8 py-3 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105">
+                                <i class="fas fa-rocket mr-2"></i>
+                                <span id="btn-text">Create Tournament</span>
+                                <i class="fas fa-spinner fa-spin ml-2 hidden" id="btn-spinner"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Multi-step form management
+    let currentStep = 1;
+    const totalSteps = 4;
+    
+    // Form submission handling with loading state
+    const form = document.querySelector('form');
+    const createBtn = document.getElementById('create-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const btnIcon = createBtn.querySelector('i.fa-rocket');
+    
+    form.addEventListener('submit', function() {
+        // Show loading state
+        createBtn.disabled = true;
+        btnIcon.classList.add('hidden');
+        btnSpinner.classList.remove('hidden');
+        btnText.textContent = 'Creating Tournament...';
+        
+        // Add visual feedback
+        createBtn.classList.remove('hover:scale-105');
+        createBtn.classList.add('opacity-75');
+    });
+    
+    // Multi-step navigation functions
+    function updateProgressIndicator(step) {
+        const currentStepSpan = document.getElementById('current-step');
+        const progressBar = document.getElementById('progress-bar');
+        const stepIndicators = document.querySelectorAll('.step-indicator');
+        
+        // Update current step number
+        currentStepSpan.textContent = step;
+        
+        // Update progress bar
+        const progress = (step / totalSteps) * 100;
+        progressBar.style.width = `${progress}%`;
+        
+        // Update step indicators
+        stepIndicators.forEach((indicator, index) => {
+            const stepNumber = index + 1;
+            const circle = indicator.querySelector('.step-circle');
+            
+            // Reset classes
+            indicator.classList.remove('step-active', 'step-completed');
+            
+            if (stepNumber < step) {
+                // Completed step
+                indicator.classList.add('step-completed');
+                circle.innerHTML = '<i class="fas fa-check text-sm"></i>';
+            } else if (stepNumber === step) {
+                // Current step
+                indicator.classList.add('step-active');
+                circle.textContent = stepNumber;
+            } else {
+                // Future step
+                circle.textContent = stepNumber;
+            }
+        });
+    }
+    
+    function showStep(step) {
+        // Hide all sections
+        document.querySelectorAll('.form-section').forEach(section => {
+            section.classList.remove('active');
+            section.classList.add('hidden');
+        });
+        
+        // Show current section
+        const currentSection = document.getElementById(`step-${step}`);
+        if (currentSection) {
+            currentSection.classList.remove('hidden');
+            currentSection.classList.add('active');
+        }
+        
+        // Update progress indicator
+        updateProgressIndicator(step);
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    function validateStep(step) {
+        let isValid = true;
+        const stepElement = document.getElementById(`step-${step}`);
+        
+        // Get only enabled required fields to avoid validating hidden fields
+        const requiredFields = stepElement.querySelectorAll('input[required]:not([disabled]), select[required]:not([disabled])');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('ring-2', 'ring-red-300', 'border-red-300');
+                isValid = false;
+            } else {
+                field.classList.remove('ring-2', 'ring-red-300', 'border-red-300');
+            }
+        });
+        
+        // Special validation for tournament type
+        if (step === 1) {
+            const tournamentType = document.querySelector('input[name="tournament_type"]:checked');
+            if (!tournamentType) {
+                showToast('Please select a tournament type', 'error');
+                isValid = false;
+            }
+        }
+        
+        // Step 2: Validate participant limits based on tournament type
+        if (step === 2) {
+            const tournamentType = document.querySelector('input[name="tournament_type"]:checked')?.value;
+            if (tournamentType === 'solo') {
+                const maxParticipants = document.getElementById('max_participants');
+                if (!maxParticipants.value || parseInt(maxParticipants.value) < 2) {
+                    maxParticipants.classList.add('ring-2', 'ring-red-300', 'border-red-300');
+                    showToast('Solo tournaments need at least 2 participants', 'error');
+                    isValid = false;
+                }
+            } else if (tournamentType === 'team') {
+                const maxTeams = document.getElementById('max_teams');
+                if (!maxTeams.value || parseInt(maxTeams.value) < 2) {
+                    maxTeams.classList.add('ring-2', 'ring-red-300', 'border-red-300');
+                    showToast('Team tournaments need at least 2 teams', 'error');
+                    isValid = false;
+                }
+            }
+        }
+        
+        if (!isValid && step !== 1) {
+            showToast('Please fill in all required fields', 'error');
+        }
+        
+        return isValid;
+    }
+    
+    function updateReviewSection() {
+        // Basic information
+        document.getElementById('review-name').textContent = document.getElementById('name').value || '-';
+        document.getElementById('review-type').textContent = document.querySelector('input[name="tournament_type"]:checked')?.value || '-';
+        document.getElementById('review-game').textContent = document.getElementById('sport').options[document.getElementById('sport').selectedIndex]?.text || '-';
+        document.getElementById('review-format').textContent = document.getElementById('format').options[document.getElementById('format').selectedIndex]?.text || '-';
+        
+        // Schedule
+        document.getElementById('review-start-date').textContent = document.getElementById('start_date').value || '-';
+        document.getElementById('review-end-date').textContent = document.getElementById('end_date').value || '-';
+        document.getElementById('review-reg-deadline').textContent = document.getElementById('registration_deadline').value || '-';
+        
+        // Participants
+        const tournamentType = document.querySelector('input[name="tournament_type"]:checked')?.value;
+        let maxParticipants, locationValue;
+        
+        if (tournamentType === 'solo') {
+            maxParticipants = document.getElementById('max_participants')?.value || '-';
+            locationValue = document.getElementById('location')?.value || '-';
+        } else if (tournamentType === 'team') {
+            maxParticipants = document.getElementById('max_teams')?.value || '-';
+            locationValue = document.getElementById('team_location')?.value || '-';
+        } else {
+            maxParticipants = '-';
+            locationValue = '-';
+        }
+        
+        document.getElementById('review-participants').textContent = maxParticipants;
+        document.getElementById('review-location').textContent = locationValue;
+        
+        // Prize & Entry
+        const entryFee = document.getElementById('entry_fee').value;
+        document.getElementById('review-entry-fee').textContent = entryFee == 0 ? 'Free' : `$${entryFee}`;
+        const prizePool = document.getElementById('prize_pool').value;
+        document.getElementById('review-prize-pool').textContent = prizePool == 0 ? 'No prize pool' : `$${prizePool}`;
+        document.getElementById('review-visibility').textContent = document.getElementById('is_public').checked ? 'Public' : 'Private';
+    }
+    
+    // Navigation event listeners
+    document.getElementById('next-step-1')?.addEventListener('click', function() {
+        if (validateStep(1)) {
+            currentStep = 2;
+            showStep(currentStep);
+        }
+    });
+    
+    document.getElementById('next-step-2')?.addEventListener('click', function() {
+        if (validateStep(2)) {
+            currentStep = 3;
+            showStep(currentStep);
+        }
+    });
+    
+    document.getElementById('next-step-3')?.addEventListener('click', function() {
+        currentStep = 4;
+        updateReviewSection();
+        showStep(currentStep);
+    });
+    
+    document.getElementById('prev-step-2')?.addEventListener('click', function() {
+        currentStep = 1;
+        showStep(currentStep);
+    });
+    
+    document.getElementById('prev-step-3')?.addEventListener('click', function() {
+        currentStep = 2;
+        showStep(currentStep);
+    });
+    
+    document.getElementById('prev-step-4')?.addEventListener('click', function() {
+        currentStep = 3;
+        showStep(currentStep);
+    });
+    
+    // Auto-adjust max players based on sport selection
+    document.getElementById('sport').addEventListener('change', function() {
+        const sport = this.value;
+        const maxPlayersInput = document.getElementById('max_players_per_team');
+        
+        // Set default max players based on sport
+        const defaults = {
+            'soccer': 11,
+            'futsal': 5,
+            'basketball': 5,
+            'volleyball': 6,
+            'handball': 7,
+            'tennis': 1,
+            'table_tennis': 1,
+            'moba': 5,
+            'battle_royale': 4,
+            'shooting_games': 5,
+            'pes': 1,
+            'fifa': 1
+        };
+        
+        if (defaults[sport] && maxPlayersInput) {
+            maxPlayersInput.value = defaults[sport];
+            // Add visual feedback
+            maxPlayersInput.classList.add('ring-2', 'ring-green-200');
+            setTimeout(() => {
+                maxPlayersInput.classList.remove('ring-2', 'ring-green-200');
+            }, 1000);
+        }
+    });
+    
+    // Tournament Type Selection
+    const tournamentTypeCards = document.querySelectorAll('.tournament-type-card');
+    const soloFields = document.getElementById('solo_fields');
+    const teamFields = document.getElementById('team_fields');
+    
+    tournamentTypeCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            const option = this.querySelector('.tournament-type-option');
+            const indicator = this.querySelector('.w-4.h-4'); // Fixed selector for the inner circle
+            
+            // Reset all cards
+            tournamentTypeCards.forEach(otherCard => {
+                const otherOption = otherCard.querySelector('.tournament-type-option');
+                const otherIndicator = otherCard.querySelector('.w-4.h-4'); // Fixed selector
+                otherOption.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500', 'ring-green-500');
+                if (otherIndicator) {
+                    otherIndicator.classList.add('hidden');
+                }
+            });
+            
+            // Select this card
+            radio.checked = true;
+            option.classList.add('ring-2', 'ring-offset-2');
+            if (indicator) {
+                indicator.classList.remove('hidden');
+            }
+            
+            // Add appropriate ring color and toggle fields
+            if (radio.value === 'solo') {
+                option.classList.add('ring-blue-500');
+                toggleTournamentFields('solo');
+            } else if (radio.value === 'team') {
+                option.classList.add('ring-green-500');
+                toggleTournamentFields('team');
+            }
+        });
+    });
+    
+    // Real-time form validation feedback
+    const requiredFields = ['name', 'sport', 'format'];
+    requiredFields.forEach(fieldName => {
+        const field = document.getElementById(fieldName);
+        field.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.classList.add('ring-2', 'ring-red-300', 'border-red-300');
+            } else {
+                this.classList.remove('ring-2', 'ring-red-300', 'border-red-300');
+                this.classList.add('ring-2', 'ring-green-200');
+                setTimeout(() => {
+                    this.classList.remove('ring-2', 'ring-green-200');
+                }, 500);
+            }
+        });
+    });
+    
+    // Validate dates with better feedback
+    document.getElementById('start_date').addEventListener('change', function() {
+        const startDate = new Date(this.value);
+        const endDateInput = document.getElementById('end_date');
+        const regDeadlineInput = document.getElementById('registration_deadline');
+        
+        // Set minimum end date to start date
+        if (this.value) {
+            endDateInput.min = this.value;
+            regDeadlineInput.max = this.value;
+            
+            // Show helpful message
+            showToast('Date constraints updated!', 'success');
+        }
+    });
+    
+    
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full ${
+            type === 'success' ? 'bg-green-500 text-white' : 
+            type === 'error' ? 'bg-red-500 text-white' : 
+            'bg-blue-500 text-white'
+        }`;
+        toast.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle mr-2"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Slide in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Slide out and remove
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Utility function to toggle tournament type fields
+    function toggleTournamentFields(type) {
+        const soloFields = document.getElementById('solo_fields');
+        const teamFields = document.getElementById('team_fields');
+        
+        if (type === 'solo') {
+            soloFields.classList.remove('hidden');
+            teamFields.classList.add('hidden');
+            
+            // Enable solo fields, disable team fields
+            soloFields.querySelectorAll('input').forEach(input => input.disabled = false);
+            teamFields.querySelectorAll('input').forEach(input => input.disabled = true);
+            
+        } else if (type === 'team') {
+            teamFields.classList.remove('hidden');
+            soloFields.classList.add('hidden');
+            
+            // Enable team fields, disable solo fields
+            teamFields.querySelectorAll('input').forEach(input => input.disabled = false);
+            soloFields.querySelectorAll('input').forEach(input => input.disabled = true);
+        }
+    }
+    
+    // Initialize the form with proper defaults
+    function initializeForm() {
+        // Hide both tournament type fields initially
+        document.getElementById('solo_fields').classList.add('hidden');
+        document.getElementById('team_fields').classList.add('hidden');
+        
+        // Disable all tournament type specific fields initially
+        document.getElementById('solo_fields').querySelectorAll('input').forEach(input => input.disabled = true);
+        document.getElementById('team_fields').querySelectorAll('input').forEach(input => input.disabled = true);
+        
+        // Set minimum dates
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('start_date').min = today;
+        document.getElementById('end_date').min = today;
+        document.getElementById('registration_deadline').min = today;
+        
+        // Show first step
+        showStep(1);
+    }
+    
+    // Initialize the form
+    initializeForm();
+</script>
+{% endblock %}
+{% endblock %}

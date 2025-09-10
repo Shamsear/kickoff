@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}Contact - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Enhanced gradient backgrounds with animated patterns */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+        animation: gradientShift 8s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%); }
+        50% { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 25%, #86efac 50%, #4ade80 75%, #10b981 100%); }
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23fff' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    
+    /* Enhanced feature card styling with glassmorphism */
+    .feature-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 32px 64px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+    
+    /* Enhanced form styling */
+    .form-input {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 2px solid #e5e7eb;
+    }
+    
+    .form-input:hover {
+        border-color: #d1d5db;
+        background: #ffffff;
+    }
+    
+    .form-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.15);
+        background: #ffffff;
+        border-color: #10b981;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Contact Header with Breadcrumbs -->
+    <div class="hero-gradient shadow">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumb -->
+            <nav class="flex pt-20 pb-3" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <div>
+                            <a href="{{ url_for('main.index') }}" class="text-gray-600 hover:text-gray-700 text-sm">
+                                <i class="fas fa-home"></i>
+                                <span class="sr-only">Home</span>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 text-xs mx-3"></i>
+                            <span class="text-sm font-semibold text-gray-900">Contact</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="md:flex md:items-center md:justify-between pb-8">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900">
+                        <i class="fas fa-comments text-green-600 mr-3"></i>
+                        Contact Us
+                    </h1>
+                    <p class="mt-2 text-base text-gray-700">
+                        We'd love to hear from you. Get in touch with our team for support, questions, or feedback.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Contact Form -->
+            <div class="bg-white rounded-xl shadow p-8 feature-card">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-envelope text-green-600 mr-2"></i>Send us a Message
+                </h2>
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                First Name
+                            </label>
+                            <input type="text" id="first_name" name="first_name" required
+                                   class="form-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Last Name
+                            </label>
+                            <input type="text" id="last_name" name="last_name" required
+                                   class="form-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address
+                        </label>
+                        <input type="email" id="email" name="email" required
+                               class="form-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
+                            Subject
+                        </label>
+                        <select id="subject" name="subject" required
+                                class="form-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
+                            <option value="">Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="partnership">Partnership Opportunity</option>
+                            <option value="tournament">Tournament Organization Help</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+                            Message
+                        </label>
+                        <textarea id="message" name="message" rows="5" required
+                                  class="form-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none resize-none"
+                                  placeholder="Tell us how we can help you organize your tournament or improve Kickoff Arena..."></textarea>
+                    </div>
+                    
+                    <button type="submit" 
+                            class="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-4 rounded-xl font-bold transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5">
+                        <i class="fas fa-paper-plane mr-2"></i>Send Message
+                    </button>
+                </form>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Email Support</h3>
+                            <p class="text-gray-600 mb-2">Get help with tournament setup, technical issues, or general questions</p>
+                            <a href="mailto:support@kickoffarena.com" class="text-green-600 hover:text-green-700 font-medium">
+                                support@kickoffarena.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+                            <i class="fas fa-question-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Tournament Help</h3>
+                            <p class="text-gray-600 mb-2">Need assistance setting up your tournament? We're here to help!</p>
+                            <p class="text-sm text-gray-500">Response time: Usually within 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
+                            <i class="fas fa-bug text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Bug Reports & Feature Requests</h3>
+                            <p class="text-gray-600 mb-2">Help us improve by reporting issues or suggesting new features</p>
+                            <a href="mailto:feedback@kickoffarena.com" class="text-purple-600 hover:text-purple-700 font-medium">
+                                feedback@kickoffarena.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-6 feature-card">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-yellow-100 text-yellow-600 p-3 rounded-lg">
+                            <i class="fas fa-handshake text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Partnerships & Business</h3>
+                            <p class="text-gray-600 mb-2">Interested in partnering with us or have a business inquiry?</p>
+                            <a href="mailto:business@kickoffarena.com" class="text-yellow-600 hover:text-yellow-700 font-medium">
+                                business@kickoffarena.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Help Section -->
+                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 feature-card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-lightbulb text-green-600 mr-2"></i>Quick Help
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-gray-900">How do I create my first tournament?</h4>
+                            <p class="text-sm text-gray-600 mt-1">Sign up for a free account and use our Tournament Builder. It takes just 3-5 minutes to set up a complete tournament!</p>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Can participants register themselves?</h4>
+                            <p class="text-sm text-gray-600 mt-1">Yes! Share your tournament link and participants can register directly. You can also add participants manually.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Is Kickoff Arena really free?</h4>
+                            <p class="text-sm text-gray-600 mt-1">Absolutely! All core features are free forever with no limits on tournaments, participants, or matches.</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-green-200">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="{{ url_for('main.features') }}" 
+                               class="inline-flex items-center justify-center px-4 py-2 border border-green-600 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-star mr-1"></i>View Features
+                            </a>
+                            <a href="{{ url_for('main.explore') }}"
+                               class="inline-flex items-center justify-center px-4 py-2 border border-green-600 text-green-600 hover:bg-green-600 hover:text-white rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-search mr-1"></i>Browse Tournaments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

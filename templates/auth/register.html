@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    .floating-shape:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 70%; right: 15%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { top: 35%; left: 85%; animation-delay: 4s; }
+    .floating-shape:nth-child(4) { bottom: 15%; left: 25%; animation-delay: 1s; }
+    .floating-shape:nth-child(5) { bottom: 50%; right: 8%; animation-delay: 3s; }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    .register-card {
+        backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(76, 175, 80, 0.2);
+        box-shadow: 0 20px 40px rgba(76, 175, 80, 0.15);
+    }
+    .password-strength {
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-gradient min-h-screen flex items-center justify-center relative py-8">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+    <div class="floating-shape w-16 h-16 bg-yellow-300 rounded-full"></div>
+    <div class="floating-shape w-24 h-24 bg-white rounded-full"></div>
+    <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+    <div class="floating-shape w-18 h-18 bg-white rounded-full"></div>
+    
+    <div class="max-w-lg w-full px-6 relative z-10">
+        <div class="register-card rounded-3xl p-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-2xl w-20 h-20 mx-auto flex items-center justify-center mb-6 shadow-lg">
+                    <img src="/static/images/logow.png" alt="Kickoff Arena" class="h-10 w-auto filter brightness-0 invert">
+                </div>
+                <h1 class="text-3xl font-black text-gray-900 mb-2">Join Kickoff Arena</h1>
+                <p class="text-gray-600">Create tournaments in <span class="font-bold text-green-600">under 3 minutes</span></p>
+            </div>
+            
+            <!-- Registration Form -->
+            <form method="POST" class="space-y-5">
+                <div>
+                    <label for="full_name" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-user text-green-600 mr-2"></i>Full Name
+                    </label>
+                    <input id="full_name" name="full_name" type="text" required 
+                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                           placeholder="Your full name">
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-envelope text-green-600 mr-2"></i>Email Address
+                    </label>
+                    <input id="email" name="email" type="email" required 
+                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                           placeholder="your@email.com">
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-lock text-green-600 mr-2"></i>Password
+                    </label>
+                    <input id="password" name="password" type="password" required 
+                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                           placeholder="Create a strong password">
+                    <!-- Password Strength Indicator -->
+                    <div class="mt-2">
+                        <div class="flex space-x-1">
+                            <div id="strength-1" class="h-1 w-1/4 bg-gray-200 rounded transition-colors"></div>
+                            <div id="strength-2" class="h-1 w-1/4 bg-gray-200 rounded transition-colors"></div>
+                            <div id="strength-3" class="h-1 w-1/4 bg-gray-200 rounded transition-colors"></div>
+                            <div id="strength-4" class="h-1 w-1/4 bg-gray-200 rounded transition-colors"></div>
+                        </div>
+                        <p id="strength-text" class="text-xs text-gray-500 mt-1">At least 6 characters</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="confirm_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-check text-green-600 mr-2"></i>Confirm Password
+                    </label>
+                    <input id="confirm_password" name="confirm_password" type="password" required 
+                           class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                           placeholder="Confirm your password">
+                    <p id="confirm-text" class="text-xs text-gray-500 mt-1">Re-enter your password</p>
+                </div>
+                
+                <!-- Terms Agreement -->
+                <div class="flex items-start space-x-2">
+                    <input id="terms" name="terms" type="checkbox" required
+                           class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mt-1">
+                    <label for="terms" class="text-sm text-gray-600">
+                        I agree to the <a href="#" class="text-green-600 hover:text-green-700 font-semibold">Terms of Service</a> and <a href="#" class="text-green-600 hover:text-green-700 font-semibold">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <div>
+                    <button type="submit" id="register-btn"
+                            class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3.5 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                        <i class="fas fa-rocket mr-2" id="register-icon"></i>
+                        <i class="fas fa-spinner fa-spin mr-2 hidden" id="register-spinner"></i>
+                        <span id="register-text">Create Free Account</span>
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Divider -->
+            <div class="my-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Already have an account?</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sign In Link -->
+            <div class="text-center">
+                <a href="{{ url_for('auth.login') }}" 
+                   class="inline-flex items-center justify-center w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-sign-in-alt mr-2 text-green-600"></i>
+                    Sign In to Your Account
+                </a>
+            </div>
+        </div>
+        
+        <!-- Benefits -->
+        <div class="grid grid-cols-3 gap-4 mt-8 text-center text-sm text-gray-600">
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span class="font-semibold">3-Min Setup</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <span class="font-semibold">Free Forever</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-2">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="font-semibold">12k+ Users</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Enhanced loading state management
+    const form = document.querySelector('form');
+    const registerBtn = document.getElementById('register-btn');
+    const registerIcon = document.getElementById('register-icon');
+    const registerSpinner = document.getElementById('register-spinner');
+    const registerText = document.getElementById('register-text');
+    
+    form.addEventListener('submit', function() {
+        registerBtn.disabled = true;
+        registerIcon.classList.add('hidden');
+        registerSpinner.classList.remove('hidden');
+        registerText.textContent = 'Creating Account...';
+    });
+    
+    // Enhanced password strength indicator
+    const passwordInput = document.getElementById('password');
+    const strengthBars = [1, 2, 3, 4].map(i => document.getElementById(`strength-${i}`));
+    const strengthText = document.getElementById('strength-text');
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        let feedback = '';
+        
+        // Reset bars
+        strengthBars.forEach(bar => {
+            bar.className = 'h-1 w-1/4 bg-gray-200 rounded transition-colors';
+        });
+        
+        if (password.length >= 6) strength++;
+        if (password.match(/[a-z]/)) strength++;
+        if (password.match(/[A-Z]/)) strength++;
+        if (password.match(/[0-9]/) || password.match(/[^a-zA-Z0-9]/)) strength++;
+        
+        // Update bars and feedback
+        if (strength === 0) {
+            feedback = 'At least 6 characters';
+        } else if (strength === 1) {
+            strengthBars[0].className = 'h-1 w-1/4 bg-red-400 rounded transition-colors';
+            feedback = 'Weak - Add uppercase & numbers';
+        } else if (strength === 2) {
+            strengthBars[0].className = 'h-1 w-1/4 bg-orange-400 rounded transition-colors';
+            strengthBars[1].className = 'h-1 w-1/4 bg-orange-400 rounded transition-colors';
+            feedback = 'Fair - Add numbers or symbols';
+        } else if (strength === 3) {
+            strengthBars[0].className = 'h-1 w-1/4 bg-yellow-400 rounded transition-colors';
+            strengthBars[1].className = 'h-1 w-1/4 bg-yellow-400 rounded transition-colors';
+            strengthBars[2].className = 'h-1 w-1/4 bg-yellow-400 rounded transition-colors';
+            feedback = 'Good password!';
+        } else if (strength === 4) {
+            strengthBars.forEach(bar => {
+                bar.className = 'h-1 w-1/4 bg-green-500 rounded transition-colors';
+            });
+            feedback = 'Strong password!';
+        }
+        
+        strengthText.textContent = feedback;
+        strengthText.className = `text-xs mt-1 ${strength <= 1 ? 'text-red-500' : strength <= 2 ? 'text-orange-500' : strength <= 3 ? 'text-yellow-600' : 'text-green-600'}`;
+    });
+    
+    // Enhanced password confirmation validation
+    const confirmInput = document.getElementById('confirm_password');
+    const confirmText = document.getElementById('confirm-text');
+    
+    function validatePasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmInput.value;
+        
+        if (confirmPassword === '') {
+            confirmText.textContent = 'Re-enter your password';
+            confirmText.className = 'text-xs text-gray-500 mt-1';
+            confirmInput.setCustomValidity('');
+        } else if (password !== confirmPassword) {
+            confirmText.textContent = 'Passwords do not match';
+            confirmText.className = 'text-xs text-red-500 mt-1';
+            confirmInput.setCustomValidity('Passwords do not match');
+        } else {
+            confirmText.textContent = 'Passwords match!';
+            confirmText.className = 'text-xs text-green-600 mt-1';
+            confirmInput.setCustomValidity('');
+        }
+    }
+    
+    confirmInput.addEventListener('input', validatePasswordMatch);
+    passwordInput.addEventListener('input', validatePasswordMatch);
+    
+    // Form validation feedback
+    const inputs = [document.getElementById('full_name'), document.getElementById('email'), passwordInput, confirmInput];
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value && this.checkValidity()) {
+                this.classList.remove('border-red-300', 'focus:ring-red-500');
+                this.classList.add('border-green-300');
+            } else if (this.value && !this.checkValidity()) {
+                this.classList.remove('border-green-300');
+                this.classList.add('border-red-300', 'focus:ring-red-500');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

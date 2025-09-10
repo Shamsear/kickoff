@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+
+{% block title %}{% if team %}Edit Team{% else %}Add New Team{% endif %} - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Enhanced modern styling */
+    .feature-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .hero-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 60%; right: 10%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        transition: all 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-section {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        transition: all 0.3s ease;
+    }
+    
+    .form-section:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+    
+    .input-group {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        pointer-events: none;
+        color: inherit;
+    }
+    
+    .has-icon {
+        padding-left: 48px !important;
+    }
+    
+    .progress-step {
+        transition: all 0.3s ease;
+    }
+    
+    .progress-step.active {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: white;
+    }
+    
+    .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 16px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+        padding-right: 44px !important;
+        appearance: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100">
+    
+    <!-- Hero Section -->
+    <div class="hero-gradient text-white py-16 relative">
+        <!-- Floating shapes -->
+        <div class="floating-shape w-32 h-32 bg-white rounded-full"></div>
+        <div class="floating-shape w-24 h-24 bg-white rounded-lg"></div>
+        <div class="floating-shape w-40 h-40 bg-white rounded-full"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center space-x-2 text-sm mb-8 text-blue-100">
+                <a href="{{ url_for('main.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+                    <i class="fas fa-home mr-1"></i>
+                    Dashboard
+                </a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-white transition-colors">{{ tournament.name }}</a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <a href="{{ url_for('tournament.teams', tournament_id=tournament.id) }}" class="hover:text-white transition-colors">Teams</a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <span class="text-white">{% if team %}Edit Team{% else %}Add Team{% endif %}</span>
+            </nav>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mr-4">
+                            <i class="fas fa-users text-3xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-black mb-2">
+                                {% if team %}
+                                    Edit Team: {{ team.name }}
+                                {% else %}
+                                    Add New Team
+                                {% endif %}
+                            </h1>
+                            <p class="text-xl text-blue-100">
+                                Managing team for <span class="font-bold">{{ tournament.name }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hidden lg:flex items-center space-x-4">
+                    <div class="stats-card rounded-2xl p-6 text-gray-800">
+                        <div class="text-2xl font-black text-blue-600 mb-1">{{ teams_count or 0 }}</div>
+                        <div class="text-sm font-bold text-gray-600">Current Teams</div>
+                    </div>
+                    <div class="stats-card rounded-2xl p-6 text-gray-800">
+                        <div class="text-2xl font-black text-green-600 mb-1">{{ tournament.max_teams or 16 }}</div>
+                        <div class="text-sm font-bold text-gray-600">Max Allowed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-12">
+        
+        <!-- Progress Indicator -->
+        <div class="mb-12">
+            <div class="flex items-center justify-center space-x-4 mb-8">
+                <div class="progress-step active w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">
+                    1
+                </div>
+                <div class="w-16 h-1 bg-gray-300 rounded-full">
+                    <div class="w-full h-full bg-green-500 rounded-full"></div>
+                </div>
+                <div class="progress-step w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-300 text-gray-500">
+                    2
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="text-lg font-black text-gray-800 mb-1">Team Information</div>
+                <div class="text-sm text-gray-600">Enter team details and captain information</div>
+            </div>
+        </div>
+        
+        <!-- Team Form -->
+        <div class="max-w-4xl mx-auto">
+            <form id="teamForm" class="space-y-8" method="POST">
+                
+                <!-- Basic Team Information Section -->
+                <div class="form-section rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-users text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900">Team Information</h2>
+                            <p class="text-gray-600">Basic team details and identification</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Team Name -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Team Name *
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-users input-icon text-blue-500"></i>
+                                <input type="text" name="name" id="teamName" required
+                                       value="{% if team %}{{ team.name }}{% endif %}"
+                                       placeholder="Enter team name"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Short Name -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Short Name / Abbreviation
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-tag input-icon text-purple-500"></i>
+                                <input type="text" name="short_name" id="shortName" maxlength="10"
+                                       value="{% if team %}{{ team.short_name }}{% endif %}"
+                                       placeholder="e.g., FC, UTD, etc."
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Founded Year -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Founded Year
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-calendar input-icon text-green-500"></i>
+                                <input type="number" name="founded_year" id="foundedYear" min="1800" max="2024"
+                                       value="{% if team %}{{ team.founded_year }}{% endif %}"
+                                       placeholder="2024"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Description -->
+                    <div class="mt-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Team Description
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-file-alt input-icon text-indigo-500"></i>
+                            <textarea name="description" id="description" rows="4"
+                                      placeholder="Brief description about the team..."
+                                      class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all resize-none">{% if team %}{{ team.description }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Captain Information Section -->
+                <div class="form-section rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-crown text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900">Team Captain</h2>
+                            <p class="text-gray-600">Primary contact person for the team</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Captain Name -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Captain Name
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-user input-icon text-blue-500"></i>
+                                <input type="text" name="captain_name" id="captainName"
+                                       value="{% if team %}{{ team.captain_name }}{% endif %}"
+                                       placeholder="Full name of team captain"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Captain Email -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Captain Email
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope input-icon text-red-500"></i>
+                                <input type="email" name="captain_email" id="captainEmail"
+                                       value="{% if team %}{{ team.captain_email }}{% endif %}"
+                                       placeholder="captain@example.com"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Captain Phone -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Captain Phone
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-phone input-icon text-green-500"></i>
+                                <input type="tel" name="captain_phone" id="captainPhone"
+                                       value="{% if team %}{{ team.captain_phone }}{% endif %}"
+                                       placeholder="+1 (555) 123-4567"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Captain Position -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Captain's Playing Position
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-running input-icon text-purple-500"></i>
+                                <select name="captain_position" id="captainPosition" class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all custom-select">
+                                    <option value="">Select Position</option>
+                                    <option value="Goalkeeper" {% if team and team.captain_position == 'Goalkeeper' %}selected{% endif %}>🥅 Goalkeeper</option>
+                                    <option value="Defender" {% if team and team.captain_position == 'Defender' %}selected{% endif %}>🛡️ Defender</option>
+                                    <option value="Midfielder" {% if team and team.captain_position == 'Midfielder' %}selected{% endif %}>⚽ Midfielder</option>
+                                    <option value="Forward" {% if team and team.captain_position == 'Forward' %}selected{% endif %}>🏃 Forward</option>
+                                    <option value="Winger" {% if team and team.captain_position == 'Winger' %}selected{% endif %}>💨 Winger</option>
+                                    <option value="Striker" {% if team and team.captain_position == 'Striker' %}selected{% endif %}>🎯 Striker</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Team Preferences Section -->
+                <div class="form-section rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-cog text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900">Team Preferences</h2>
+                            <p class="text-gray-600">Additional team settings and preferences</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Preferred Formation -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Preferred Formation
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-chess-board input-icon text-indigo-500"></i>
+                                <select name="preferred_formation" id="preferredFormation" class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                                    <option value="">Select Formation</option>
+                                    <option value="4-4-2" {% if team and team.preferred_formation == '4-4-2' %}selected{% endif %}>4-4-2 Classic</option>
+                                    <option value="4-3-3" {% if team and team.preferred_formation == '4-3-3' %}selected{% endif %}>4-3-3 Attack</option>
+                                    <option value="4-5-1" {% if team and team.preferred_formation == '4-5-1' %}selected{% endif %}>4-5-1 Defensive</option>
+                                    <option value="3-5-2" {% if team and team.preferred_formation == '3-5-2' %}selected{% endif %}>3-5-2 Wing Play</option>
+                                    <option value="4-2-3-1" {% if team and team.preferred_formation == '4-2-3-1' %}selected{% endif %}>4-2-3-1 Modern</option>
+                                    <option value="5-3-2" {% if team and team.preferred_formation == '5-3-2' %}selected{% endif %}>5-3-2 Counter</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Team Colors -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Primary Team Colors
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-palette input-icon text-pink-500"></i>
+                                <input type="text" name="team_colors" id="teamColors"
+                                       value="{% if team %}{{ team.team_colors }}{% endif %}"
+                                       placeholder="e.g., Red & White, Blue & Yellow"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Notes -->
+                    <div class="mt-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2">
+                            Special Notes / Requirements
+                        </label>
+                        <div class="input-group">
+                            <i class="fas fa-sticky-note input-icon text-yellow-500"></i>
+                            <textarea name="notes" id="notes" rows="3"
+                                      placeholder="Any special requirements, playing style preferences, or additional notes..."
+                                      class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all resize-none">{% if team %}{{ team.notes }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Approval Section (for organizers) -->
+                {% if is_organizer %}
+                <div class="form-section rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-check-circle text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900">Team Status</h2>
+                            <p class="text-gray-600">Approval status for tournament participation</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="is_approved" id="isApproved" 
+                                   {% if team and team.is_approved %}checked{% endif %}
+                                   class="sr-only">
+                            <div class="relative">
+                                <div class="w-10 h-6 bg-gray-300 rounded-full shadow-inner transition duration-300 ease-in-out" id="toggleBg"></div>
+                                <div class="absolute w-4 h-4 bg-white rounded-full shadow top-1 left-1 transition duration-300 ease-in-out" id="toggleDot"></div>
+                            </div>
+                            <span class="ml-3 text-sm font-bold text-gray-800">Team Approved for Tournament</span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Only approved teams can participate in matches and be included in fixtures generation.</p>
+                </div>
+                {% endif %}
+                
+                <!-- Form Actions -->
+                <div class="feature-card rounded-2xl shadow-lg p-8">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span>{% if team %}Changes will be saved immediately{% else %}Team will be added to {{ tournament.name }}{% endif %}</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <a href="{{ url_for('tournament.teams', tournament_id=tournament.id) }}" 
+                               class="inline-flex items-center px-6 py-3 border-2 border-gray-300 rounded-xl shadow-sm text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Teams
+                            </a>
+                            
+                            <button type="submit" 
+                                    class="btn-primary inline-flex items-center px-8 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white">
+                                <i class="fas fa-{% if team %}save{% else %}plus{% endif %} mr-2"></i>
+                                {% if team %}Update Team{% else %}Add Team{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+    <!-- Success Message Template -->
+    <div id="successMessage" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg hidden">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>Team saved successfully!</span>
+        </div>
+    </div>
+    
+    <!-- Error Message Template -->
+    <div id="errorMessage" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg hidden">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="errorText">An error occurred. Please try again.</span>
+        </div>
+    </div>
+
+    <script>
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('teamForm');
+            const nameInput = document.getElementById('teamName');
+            const emailInput = document.getElementById('captainEmail');
+            const phoneInput = document.getElementById('captainPhone');
+            const toggleBg = document.getElementById('toggleBg');
+            const toggleDot = document.getElementById('toggleDot');
+            const approvalCheckbox = document.getElementById('isApproved');
+            
+            // Toggle switch functionality
+            if (approvalCheckbox && toggleBg && toggleDot) {
+                const updateToggleDisplay = () => {
+                    if (approvalCheckbox.checked) {
+                        toggleBg.classList.remove('bg-gray-300');
+                        toggleBg.classList.add('bg-green-500');
+                        toggleDot.classList.remove('translate-x-0');
+                        toggleDot.classList.add('translate-x-4');
+                    } else {
+                        toggleBg.classList.remove('bg-green-500');
+                        toggleBg.classList.add('bg-gray-300');
+                        toggleDot.classList.remove('translate-x-4');
+                        toggleDot.classList.add('translate-x-0');
+                    }
+                };
+                
+                // Set initial state
+                updateToggleDisplay();
+                
+                // Handle clicks
+                toggleBg.addEventListener('click', () => {
+                    approvalCheckbox.checked = !approvalCheckbox.checked;
+                    updateToggleDisplay();
+                });
+            }
+            
+            // Real-time validation
+            nameInput.addEventListener('input', function() {
+                validateField(this, this.value.trim().length >= 2, 'Team name must be at least 2 characters');
+            });
+            
+            emailInput.addEventListener('input', function() {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                validateField(this, !this.value || emailRegex.test(this.value), 'Please enter a valid email address');
+            });
+            
+            phoneInput.addEventListener('input', function() {
+                const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+                validateField(this, !this.value || phoneRegex.test(this.value.replace(/[\s\-\(\)]/g, '')), 'Please enter a valid phone number');
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+                    submitBtn.disabled = true;
+                    
+                    // Just submit the form normally
+                    this.submit();
+                }
+            });
+            
+            // Validation helper function
+            function validateField(field, isValid, errorMessage) {
+                const errorDiv = field.parentNode.querySelector('.error-message');
+                
+                if (isValid) {
+                    field.classList.remove('border-red-500');
+                    field.classList.add('border-gray-300');
+                    if (errorDiv) errorDiv.remove();
+                } else {
+                    field.classList.remove('border-gray-300');
+                    field.classList.add('border-red-500');
+                    
+                    if (!errorDiv) {
+                        const error = document.createElement('div');
+                        error.className = 'error-message text-red-500 text-xs mt-1';
+                        error.textContent = errorMessage;
+                        field.parentNode.appendChild(error);
+                    }
+                }
+            }
+            
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                
+                if (nameInput.value.trim().length < 2) {
+                    validateField(nameInput, false, 'Team name is required');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Message display
+            function showMessage(type, message) {
+                const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+                if (type === 'error') {
+                    document.getElementById('errorText').textContent = message;
+                }
+                
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 5000);
+            }
+        });
+    </script>
+</div>
+{% endblock %}

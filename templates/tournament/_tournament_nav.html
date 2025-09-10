@@ -1,0 +1,82 @@
+<!-- Tournament Navigation Tabs -->
+<div class="border-b border-gray-200 bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="-mb-px flex space-x-8 overflow-x-auto">
+            <!-- Tournament Overview -->
+            <a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.view' %}border-primary-500 text-primary-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-home mr-2"></i>
+                Overview
+            </a>
+            
+            {% if tournament.type == 'solo' %}
+            <!-- Solo Tournament Tabs -->
+            <!-- Participants -->
+            <a href="{{ url_for('tournament.participants', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.participants' %}border-purple-500 text-purple-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-user-friends mr-2"></i>
+                Participants
+                {% if participants_count is defined %}
+                <span class="ml-2 bg-gray-100 text-gray-600 py-1 px-2 rounded-full text-xs">{{ participants_count }}</span>
+                {% endif %}
+            </a>
+            
+            <!-- Solo Fixtures -->
+            <a href="{{ url_for('tournament.solo_fixtures', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.solo_fixtures' %}border-purple-500 text-purple-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-calendar mr-2"></i>
+                Solo Fixtures
+                {% if matches_count is defined %}
+                <span class="ml-2 bg-gray-100 text-gray-600 py-1 px-2 rounded-full text-xs">{{ matches_count }}</span>
+                {% endif %}
+            </a>
+            
+            {% else %}
+            <!-- Team Tournament Tabs -->
+            <!-- Teams -->
+            <a href="{{ url_for('tournament.teams', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.teams' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-users mr-2"></i>
+                Teams
+                {% if teams_count is defined %}
+                <span class="ml-2 bg-gray-100 text-gray-600 py-1 px-2 rounded-full text-xs">{{ teams_count }}</span>
+                {% endif %}
+            </a>
+            
+            <!-- Team Fixtures -->
+            <a href="{{ url_for('tournament.matches', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.matches' %}border-blue-500 text-blue-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-calendar mr-2"></i>
+                Team Fixtures
+                {% if matches_count is defined %}
+                <span class="ml-2 bg-gray-100 text-gray-600 py-1 px-2 rounded-full text-xs">{{ matches_count }}</span>
+                {% endif %}
+            </a>
+            {% endif %}
+            
+            <!-- Common Tabs -->
+            <!-- Standings -->
+            <a href="{{ url_for('tournament.standings', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.standings' %}border-yellow-500 text-yellow-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-trophy mr-2"></i>
+                Standings
+            </a>
+            
+            <!-- Statistics -->
+            <a href="{{ url_for('tournament.statistics', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.statistics' %}border-green-500 text-green-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-chart-bar mr-2"></i>
+                Statistics
+            </a>
+            
+            {% if is_organizer %}
+            <!-- Edit Tournament (Organizer Only) -->
+            <a href="{{ url_for('tournament.edit', tournament_id=tournament.id) }}" 
+               class="{% if request.endpoint == 'tournament.edit' %}border-red-500 text-red-600{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300{% endif %} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center">
+                <i class="fas fa-edit mr-2"></i>
+                Edit
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+</div>

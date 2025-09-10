@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} Players - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Enhanced hero gradient matching other pages */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        animation: float 20s infinite linear;
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 60%; right: 20%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { top: 40%; left: 80%; animation-delay: 4s; }
+    .floating-shape:nth-child(4) { bottom: 20%; left: 20%; animation-delay: 1s; }
+    .floating-shape:nth-child(5) { bottom: 40%; right: 10%; animation-delay: 3s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    /* Enhanced feature card styling */
+    .feature-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 50px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Player card styling */
+    .player-card {
+        background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+        border: 1px solid rgba(16, 185, 129, .1);
+        transition: all .3s ease;
+    }
+    
+    .player-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, .08);
+        border-color: rgba(16, 185, 129, .2);
+    }
+    
+    /* Enhanced buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Animate on entry */
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Modern Hero Header -->
+    <div class="hero-gradient border-b border-green-100">
+        <!-- Enhanced Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+        <div class="floating-shape w-14 h-14 bg-green-200 rounded-full"></div>
+        <div class="floating-shape w-8 h-8 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2">
+                    <li><a href="{{ url_for('main.index') }}" class="hover:text-gray-900"><i class="fas fa-home"></i></a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-gray-900">{{ tournament.name }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.teams', tournament_id=tournament.id) }}" class="hover:text-gray-900">Teams</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li class="text-gray-900 font-semibold">{{ team.name }}</li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <span class="text-white font-bold text-xl">{{ team.name[:2]|upper }}</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black text-gray-900">{{ team.name }} Players</h1>
+                        <p class="text-gray-700">Team roster for <span class="font-semibold text-green-600">{{ tournament.name }}</span></p>
+                    </div>
+                </div>
+                
+                {% if is_organizer %}
+                <div class="flex items-center space-x-3">
+                    <a href="/tournament/{{ tournament.id }}/team/{{ team.id }}/player/add" 
+                       class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-lg">
+                        <i class="fas fa-user-plus mr-2"></i>Add Player
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-green-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ players|length }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">Total Players</div>
+                        </div>
+                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-blue-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ players|selectattr('jersey_number')|list|length }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">With Jersey #</div>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-purple-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ players|selectattr('position')|list|length }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">With Positions</div>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-running"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-yellow-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-2xl font-black text-gray-900">{{ (tournament.max_players_per_team or 25) - players|length }}</div>
+                            <div class="text-gray-600 text-sm font-semibold">Spots Left</div>
+                        </div>
+                        <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% if players %}
+        <!-- Enhanced Players Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for player in players %}
+            <div class="player-card rounded-2xl overflow-hidden shadow-lg">
+                <!-- Player Header -->
+                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-100 border-b border-blue-200 relative">
+                    {% if player.jersey_number %}
+                    <div class="absolute top-2 right-2 w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                        <span class="text-white font-bold text-sm">{{ player.jersey_number }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="flex items-center space-x-3">
+                        <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-sm">
+                            {% if player.jersey_number %}
+                            <span class="text-white font-bold text-lg">{{ player.jersey_number }}</span>
+                            {% else %}
+                            <i class="fas fa-user text-white text-lg"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="text-base font-black text-gray-900">{{ player.name }}</div>
+                            {% if player.position %}
+                            <div class="text-sm text-blue-600 font-medium">
+                                <i class="fas fa-running mr-1"></i>{{ player.position }}
+                            </div>
+                            {% else %}
+                            <div class="text-sm text-gray-500">
+                                <i class="fas fa-user mr-1"></i>Player
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Player Info -->
+                <div class="p-6">
+                    <!-- Contact Info -->
+                    <div class="space-y-3 mb-5">
+                        {% if player.email %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-envelope text-green-500 mr-3 w-4"></i>
+                            <span class="truncate font-medium">{{ player.email }}</span>
+                        </div>
+                        {% endif %}
+                        {% if player.phone %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-phone text-blue-500 mr-3 w-4"></i>
+                            <span class="font-medium">{{ player.phone }}</span>
+                        </div>
+                        {% endif %}
+                        {% if player.date_of_birth %}
+                        {% set birth_date = player.date_of_birth[:10] %}
+                        {% set age = ((2024 | int) - (birth_date[:4] | int)) %}
+                        <div class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-birthday-cake text-purple-500 mr-3 w-4"></i>
+                            <span class="font-medium">{{ age }} years old</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if is_organizer %}
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div class="text-xs text-gray-500">
+                            <i class="fas fa-user-edit mr-1"></i>
+                            Player #{{ loop.index }}
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <a href="/tournament/{{ tournament.id }}/team/{{ team.id }}/player/{{ player.id }}/edit" 
+                               class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all" 
+                               title="Edit Player">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button onclick="deletePlayer('{{ player.id }}')" 
+                                    class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all" 
+                                    title="Delete Player">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Enhanced Empty State -->
+        <div class="feature-card rounded-2xl shadow-xl p-16 text-center animate-fadeIn">
+            <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fas fa-user-plus text-gray-400 text-4xl"></i>
+            </div>
+            
+            <h3 class="text-2xl font-black text-gray-900 mb-4">No Players Added Yet</h3>
+            <p class="text-gray-600 text-lg mb-8 max-w-md mx-auto">
+                Build your team roster by adding players. Each player can have a jersey number, position, and contact details.
+            </p>
+            
+            {% if is_organizer %}
+            <div class="space-y-4">
+                <a href="/tournament/{{ tournament.id }}/team/{{ team.id }}/player/add" 
+                   class="btn-primary inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Add First Player
+                </a>
+                
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-lightbulb mr-1 text-yellow-500"></i>
+                    You can add up to {{ tournament.max_players_per_team or 25 }} players to this team
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 border border-green-100">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-info-circle text-green-600 mr-2"></i>
+                    <span class="text-green-800 font-medium">Only the tournament organizer can manage players</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+<script>
+// Delete Player Function
+function deletePlayer(playerId) {
+    if (confirm('Are you sure you want to delete this player? This action cannot be undone.')) {
+        fetch(`{{ url_for('tournament.delete_player', tournament_id=tournament.id, team_id=team.id, player_id='PLACEHOLDER') }}`.replace('PLACEHOLDER', playerId), {
+            method: 'DELETE',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to delete player'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete player');
+        });
+    }
+}
+</script>
+{% endblock %}

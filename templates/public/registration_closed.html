@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Closed - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Tournament Header -->
+        <div class="bg-white rounded-lg shadow-md mb-8 overflow-hidden">
+            <div class="bg-gradient-tournament p-6 text-white">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                        <i class="fas {% if tournament.type == 'solo' %}fa-user{% else %}fa-users{% endif %} text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold">{{ tournament.name }}</h1>
+                        <p class="text-gray-100 mt-1">
+                            <i class="fas fa-calendar mr-2"></i>
+                            {% if tournament.start_date %}
+                                {% if tournament.start_date is string %}
+                                    {{ tournament.start_date[:10] }}
+                                {% else %}
+                                    {{ tournament.start_date.strftime('%B %d, %Y') }}
+                                {% endif %}
+                            {% else %}
+                                Date TBD
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Closed Message -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Status Header -->
+            <div class="{% if tournament.status == 'completed' %}bg-gray-600{% elif tournament.status == 'in_progress' %}bg-blue-600{% else %}bg-yellow-600{% endif %} p-6 text-white text-center">
+                <div class="bg-white bg-opacity-20 p-4 rounded-full inline-flex items-center justify-center mb-4">
+                    {% if tournament.status == 'completed' %}
+                        <i class="fas fa-trophy text-4xl"></i>
+                    {% elif tournament.status == 'in_progress' %}
+                        <i class="fas fa-play-circle text-4xl"></i>
+                    {% else %}
+                        <i class="fas fa-clock text-4xl"></i>
+                    {% endif %}
+                </div>
+                <h1 class="text-3xl font-bold mb-2">
+                    {% if tournament.status == 'completed' %}
+                        Tournament Completed
+                    {% elif tournament.status == 'in_progress' %}
+                        Tournament In Progress
+                    {% else %}
+                        Registration Closed
+                    {% endif %}
+                </h1>
+                <p class="{% if tournament.status == 'completed' %}text-gray-100{% elif tournament.status == 'in_progress' %}text-blue-100{% else %}text-yellow-100{% endif %} text-lg">
+                    {% if tournament.status == 'completed' %}
+                        This tournament has been completed and is no longer accepting registrations.
+                    {% elif tournament.status == 'in_progress' %}
+                        This tournament is currently running and is no longer accepting new registrations.
+                    {% else %}
+                        This tournament is not currently accepting new registrations.
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Tournament Information -->
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center mb-8">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-primary-600">{{ tournament.type|title }}</div>
+                        <div class="text-gray-600 text-sm">Tournament Type</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold 
+                            {% if tournament.status == 'completed' %}text-gray-600
+                            {% elif tournament.status == 'in_progress' %}text-blue-600
+                            {% else %}text-yellow-600
+                            {% endif %}">
+                            {{ tournament.status|title|replace('_', ' ') }}
+                        </div>
+                        <div class="text-gray-600 text-sm">Status</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600">{{ tournament.current_participants or 0 }}</div>
+                        <div class="text-gray-600 text-sm">Participants</div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600">
+                            {% if tournament.entry_fee %}${{ tournament.entry_fee }}{% else %}Free{% endif %}
+                        </div>
+                        <div class="text-gray-600 text-sm">Entry Fee</div>
+                    </div>
+                </div>
+
+                <!-- Status Details -->
+                <div class="{% if tournament.status == 'completed' %}bg-gray-50 border-gray-200{% elif tournament.status == 'in_progress' %}bg-blue-50 border-blue-200{% else %}bg-yellow-50 border-yellow-200{% endif %} border rounded-lg p-6 mb-8">
+                    <h3 class="text-lg font-semibold {% if tournament.status == 'completed' %}text-gray-900{% elif tournament.status == 'in_progress' %}text-blue-900{% else %}text-yellow-900{% endif %} mb-4">
+                        <i class="fas {% if tournament.status == 'completed' %}fa-info-circle{% elif tournament.status == 'in_progress' %}fa-gamepad{% else %}fa-exclamation-triangle{% endif %} mr-2"></i>
+                        Tournament Status
+                    </h3>
+                    
+                    {% if tournament.status == 'completed' %}
+                        <div class="space-y-3 text-gray-800">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-check-circle text-gray-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Tournament Completed</p>
+                                    <p class="text-sm text-gray-700">This tournament has finished and final results have been recorded.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-trophy text-gray-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">View Results</p>
+                                    <p class="text-sm text-gray-700">Check out the final standings and match results below.</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif tournament.status == 'in_progress' %}
+                        <div class="space-y-3 text-blue-800">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-play text-blue-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Matches in Progress</p>
+                                    <p class="text-sm text-blue-700">The tournament is currently running with matches being played.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-eye text-blue-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Follow Along</p>
+                                    <p class="text-sm text-blue-700">You can still follow the tournament progress and view live results.</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="space-y-3 text-yellow-800">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-clock text-yellow-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Registration Period Ended</p>
+                                    <p class="text-sm text-yellow-700">The registration period for this tournament has closed.</p>
+                                </div>
+                            </div>
+                            {% if tournament.max_participants and tournament.current_participants >= tournament.max_participants %}
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-users text-yellow-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium">Tournament Full</p>
+                                    <p class="text-sm text-yellow-700">This tournament has reached its maximum capacity of {{ tournament.max_participants }} participants.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tournament Description -->
+                {% if tournament.description %}
+                <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-file-text mr-2 text-primary-600"></i>
+                        Tournament Description
+                    </h3>
+                    <div class="text-gray-700 whitespace-pre-wrap">{{ tournament.description }}</div>
+                </div>
+                {% endif %}
+
+                <!-- Alternative Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h4 class="font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-search mr-2 text-primary-600"></i>
+                            Find Other Tournaments
+                        </h4>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Browse other Football tournaments that are currently accepting registrations.
+                        </p>
+                        <a href="{{ url_for('main.explore') }}" 
+                           class="bg-primary-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-primary-700 transition-colors text-sm">
+                            Explore Tournaments
+                        </a>
+                    </div>
+
+                    {% if tournament.status not in ['completed', 'cancelled'] %}
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h4 class="font-semibold text-gray-900 mb-2">
+                            <i class="fas fa-bell mr-2 text-primary-600"></i>
+                            Future Tournaments
+                        </h4>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Get notified when similar tournaments open for registration.
+                        </p>
+                        <a href="{{ url_for('main.contact') }}" 
+                           class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-300 transition-colors text-sm">
+                            Contact Us
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tournament Details Link -->
+                <div class="text-center">
+                    <a href="{{ url_for('main.tournament_details', tournament_id=tournament.id) }}" 
+                       class="bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        View Tournament Details
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <i class="fas fa-lightbulb mr-2 text-primary-600"></i>
+                What Can You Do?
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="bg-primary-100 p-3 rounded-lg inline-flex items-center justify-center mb-3">
+                        <i class="fas fa-eye text-primary-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-900 mb-2">Follow Progress</h4>
+                    <p class="text-gray-600 text-sm">
+                        {% if tournament.status == 'completed' %}
+                            View final results and match history
+                        {% elif tournament.status == 'in_progress' %}
+                            Watch live matches and follow tournament progress
+                        {% else %}
+                            Keep track of tournament updates and announcements
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-green-100 p-3 rounded-lg inline-flex items-center justify-center mb-3">
+                        <i class="fas fa-search text-green-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-900 mb-2">Find Alternatives</h4>
+                    <p class="text-gray-600 text-sm">
+                        Discover other Football tournaments that match your interests and skill level
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-blue-100 p-3 rounded-lg inline-flex items-center justify-center mb-3">
+                        <i class="fas fa-plus text-blue-600 text-xl"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-900 mb-2">Create Your Own</h4>
+                    <p class="text-gray-600 text-sm">
+                        {% if session.user_id %}
+                            Start organizing your own Football tournament
+                        {% else %}
+                            Sign up and create your own tournament
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

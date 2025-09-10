@@ -1,0 +1,877 @@
+{% extends "base.html" %}
+
+{% block title %}{% if match.status == 'completed' %}Edit Result{% else %}Enter Result{% endif %} - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<!-- Multi-Match System JavaScript -->
+<script src="{{ url_for('static', filename='js/multi-match.js') }}" defer></script>
+<style>
+    /* Enhanced hero gradient matching other pages */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        animation: float 20s infinite linear;
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+    .floating-shape:nth-child(2) { top: 60%; right: 20%; animation-delay: 2s; }
+    .floating-shape:nth-child(3) { top: 40%; left: 80%; animation-delay: 4s; }
+    .floating-shape:nth-child(4) { bottom: 20%; left: 20%; animation-delay: 1s; }
+    .floating-shape:nth-child(5) { bottom: 40%; right: 10%; animation-delay: 3s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    /* Enhanced feature card styling */
+    .feature-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    /* Enhanced form inputs */
+    .score-input {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 2px solid rgba(16, 185, 129, 0.2);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .score-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+    }
+    
+    .match-format-option {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .match-format-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.1);
+    }
+    
+    .match-format-selected {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.05) 100%) !important;
+        border-color: #10b981 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
+    }
+    
+    /* Enhanced buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981, #34d399);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Animate on entry */
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .team-avatar {
+        background: linear-gradient(135deg, var(--team-color-1), var(--team-color-2));
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .team-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+
+<!-- Hidden Sub-Match Template -->
+<script type="text/template" id="sub-match-template">
+    <div class="sub-match-card bg-gradient-to-r from-blue-50 via-white to-red-50 rounded-2xl p-6 border border-green-100 shadow-lg" data-sub-match="{MATCH_ID}">
+        <div class="flex items-center justify-between mb-4">
+            <h4 class="text-lg font-bold text-gray-800">
+                <i class="fas fa-gamepad text-green-500 mr-2"></i>
+                Match {MATCH_NUMBER}
+            </h4>
+            <button type="button" class="remove-sub-match text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all" data-sub-match="{MATCH_ID}">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+            <!-- Team 1 Player -->
+            <div>
+                <label class="block text-sm font-bold text-blue-700 mb-2">{{ team1.name or 'Team 1' }} Player</label>
+                <select name="sub_match_{COUNTER}_team1_player" class="team1-player-select w-full border-2 border-blue-200 rounded-xl p-3 bg-white focus:ring-4 focus:ring-blue-200 focus:border-blue-400" required>
+                    <option value="">Choose player...</option>
+                    {% if team1_players %}
+                        {% for player in team1_players %}
+                        <option value="{{ player.id }}">{{ player.name }}{% if player.jersey_number %} (#{{ player.jersey_number }}){% endif %}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            
+            <!-- Team 1 Goals -->
+            <div class="text-center">
+                <label class="block text-sm font-bold text-blue-700 mb-2">Goals</label>
+                <input type="number" 
+                       name="sub_match_{COUNTER}_team1_goals" 
+                       class="team1-goals-input w-full text-center text-2xl font-bold py-3 rounded-xl border-2 border-blue-200 focus:ring-4 focus:ring-blue-200 focus:border-blue-400" 
+                       min="0" 
+                       max="20" 
+                       value="0" 
+                       required>
+            </div>
+            
+            <!-- VS Separator -->
+            <div class="text-center">
+                <div class="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto">
+                    <span class="text-lg font-black text-gray-600">VS</span>
+                </div>
+            </div>
+            
+            <!-- Team 2 Goals -->
+            <div class="text-center">
+                <label class="block text-sm font-bold text-red-700 mb-2">Goals</label>
+                <input type="number" 
+                       name="sub_match_{COUNTER}_team2_goals" 
+                       class="team2-goals-input w-full text-center text-2xl font-bold py-3 rounded-xl border-2 border-red-200 focus:ring-4 focus:ring-red-200 focus:border-red-400" 
+                       min="0" 
+                       max="20" 
+                       value="0" 
+                       required>
+            </div>
+            
+            <!-- Team 2 Player -->
+            <div>
+                <label class="block text-sm font-bold text-red-700 mb-2">{{ team2.name or 'Team 2' }} Player</label>
+                <select name="sub_match_{COUNTER}_team2_player" class="team2-player-select w-full border-2 border-red-200 rounded-xl p-3 bg-white focus:ring-4 focus:ring-red-200 focus:border-red-400" required>
+                    <option value="">Choose player...</option>
+                    {% if team2_players %}
+                        {% for player in team2_players %}
+                        <option value="{{ player.id }}">{{ player.name }}{% if player.jersey_number %} (#{{ player.jersey_number }}){% endif %}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+        
+        <!-- Match Result Indicator -->
+        <div class="mt-4 text-center">
+            <div class="match-result-indicator inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-500">
+                <i class="fas fa-clock mr-2"></i>
+                Enter goals to see result
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+    // Pass data to JavaScript
+    document.body.dataset.team1Name = '{{ team1.name or "Team 1" }}';
+    document.body.dataset.team2Name = '{{ team2.name or "Team 2" }}';
+    document.body.dataset.scoringSystem = '{{ tournament.scoring_system or "win_based" }}';
+    document.body.dataset.tournamentFormat = '{{ tournament.format_type or "league" }}';
+    
+    // Pass template to JavaScript
+    window.subMatchTemplate = document.getElementById('sub-match-template').innerHTML;
+    
+    // Pass existing sub-matches data to JavaScript
+    window.existingSubMatches = {{ existing_sub_matches|tojson if existing_sub_matches else '[]'|safe }};
+    console.log('Existing sub-matches loaded:', window.existingSubMatches);
+</script>
+    <!-- Modern Hero Header -->
+    <div class="hero-gradient border-b border-green-100">
+        <!-- Enhanced Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+        <div class="floating-shape w-14 h-14 bg-green-200 rounded-full"></div>
+        <div class="floating-shape w-8 h-8 bg-white rounded-full"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Breadcrumb -->
+            <nav class="flex text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-2">
+                    <li><a href="{{ url_for('main.index') }}" class="hover:text-gray-900"><i class="fas fa-home"></i></a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-gray-900">{{ tournament.name }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li><a href="{{ url_for('tournament.matches', tournament_id=tournament.id) }}" class="hover:text-gray-900">Match Center</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-[10px] mx-2"></i></li>
+                    <li class="text-gray-900 font-semibold">{% if match.status == 'completed' %}Edit Result{% else %}Enter Result{% endif %}</li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-gamepad text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black text-gray-900">
+                            {% if match.status == 'completed' %}Edit Match Result{% else %}Enter Match Result{% endif %}
+                        </h1>
+                        <p class="text-gray-700">{{ match.round_name or 'Match' }} - <span class="font-semibold text-green-600">{{ tournament.name }}</span></p>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-4">
+                    {% if match.scheduled_date %}
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl p-3 border border-green-100">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-calendar mr-2 text-green-500"></i>
+                            <span class="text-sm font-semibold">{{ match.scheduled_date[:10] }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if match.venue %}
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl p-3 border border-green-100">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-2 text-green-500"></i>
+                            <span class="text-sm font-semibold">{{ match.venue }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Result Entry Form -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="feature-card rounded-2xl shadow-2xl animate-fadeIn">
+            <!-- Match Header -->
+            <div class="px-8 py-6 bg-gradient-to-r from-green-50 to-white border-b border-green-100">
+                <div class="flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-futbol text-white text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">{{ match.round_name or 'Football Match' }}</h2>
+                        <p class="text-green-600 font-semibold mt-1">Official Match Result Entry</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="resultForm" class="p-8">
+                <!-- Enhanced Teams Display -->
+                <div class="mb-10">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                        <!-- Team 1 -->
+                        <div class="text-center group">
+                            <div class="team-avatar w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4" 
+                                 style="--team-color-1: #3b82f6; --team-color-2: #1d4ed8;">
+                                <span class="text-white font-black text-2xl drop-shadow-lg">{{ (team1.name or 'TBD')[:2]|upper }}</span>
+                            </div>
+                            <h3 class="text-xl font-black text-gray-900 mb-1">{{ team1.name or 'Team Blue' }}</h3>
+                            {% if team1.short_name %}
+                            <p class="text-sm text-gray-500 font-semibold uppercase tracking-wide">{{ team1.short_name }}</p>
+                            {% endif %}
+                            <div class="mt-3 px-4 py-2 bg-blue-50 rounded-full text-blue-700 text-sm font-medium border border-blue-200">
+                                <i class="fas fa-shield-alt mr-1"></i>Home Team
+                            </div>
+                        </div>
+
+                        <!-- Enhanced VS Section -->
+                        <div class="text-center relative">
+                            <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg border-4 border-white">
+                                <span class="text-3xl font-black text-gray-600">VS</span>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-blue-50 px-4 py-2 rounded-full">
+                                <div class="text-sm font-bold text-gray-700">Football Match</div>
+                                <div class="text-xs text-gray-500">Official Result</div>
+                            </div>
+                            <!-- Decorative Elements -->
+                            <div class="absolute -top-2 -left-2 w-6 h-6 bg-green-200 rounded-full opacity-50 animate-pulse"></div>
+                            <div class="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-200 rounded-full opacity-50 animate-pulse" style="animation-delay: 0.5s;"></div>
+                        </div>
+
+                        <!-- Team 2 -->
+                        <div class="text-center group">
+                            <div class="team-avatar w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4" 
+                                 style="--team-color-1: #ef4444; --team-color-2: #dc2626;">
+                                <span class="text-white font-black text-2xl drop-shadow-lg">{{ (team2.name or 'TBD')[:2]|upper }}</span>
+                            </div>
+                            <h3 class="text-xl font-black text-gray-900 mb-1">{{ team2.name or 'Team Red' }}</h3>
+                            {% if team2.short_name %}
+                            <p class="text-sm text-gray-500 font-semibold uppercase tracking-wide">{{ team2.short_name }}</p>
+                            {% endif %}
+                            <div class="mt-3 px-4 py-2 bg-red-50 rounded-full text-red-700 text-sm font-medium border border-red-200">
+                                <i class="fas fa-sword mr-1"></i>Away Team
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Score Entry Section -->
+                <div class="mb-10">
+                    {% if tournament.type == 'team' %}
+                    <!-- Team Tournament - Multi-Match System -->
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fas fa-users text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Multi-Match Results</h3>
+                        <p class="text-gray-600">Enter results for multiple player vs player matches within this team encounter</p>
+                    </div>
+                    
+                    <!-- Multi-Match Interface -->
+                    <div id="multiMatchSection" class="space-y-6">
+                        <!-- Add New Match Button -->
+                        <div class="text-center mb-6">
+                            <button type="button" id="addSubMatch" class="inline-flex items-center px-6 py-3 bg-green-500 text-white font-bold rounded-xl hover:bg-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Player Match
+                            </button>
+                            <p class="text-sm text-gray-600 mt-2">Add individual player vs player matches within this team encounter</p>
+                        </div>
+                        
+                        <!-- Sub-Matches Container -->
+                        <div id="subMatchesContainer" class="space-y-6">
+                            <!-- Sub-matches will be dynamically added here -->
+                        </div>
+                        
+                        <!-- Player Participation Tracking -->
+                        <div id="playerParticipation" class="mt-8 bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-2xl p-6 border-2 border-indigo-200">
+                            <div class="text-center mb-6">
+                                <h4 class="text-lg font-bold text-indigo-800 mb-2">
+                                    <i class="fas fa-users mr-2"></i>Player Participation
+                                </h4>
+                                <p class="text-sm text-indigo-600">Ensure all team players are either playing or marked as substitutes</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Team 1 Participation -->
+                                <div class="bg-white rounded-xl p-4 border border-blue-200">
+                                    <h5 class="font-bold text-blue-800 mb-3 text-center">
+                                        <i class="fas fa-shield-alt mr-2"></i>{{ team1.name or 'Team Blue' }}
+                                    </h5>
+                                    <div id="team1Participation" class="space-y-2">
+                                        {% if team1_players %}
+                                            {% for player in team1_players %}
+                                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg player-participation-item" data-player-id="{{ player.id }}" data-team="1">
+                                                <div class="flex items-center">
+                                                    <span class="font-semibold text-gray-800">{{ player.name }}</span>
+                                                    {% if player.jersey_number %}
+                                                    <span class="text-xs text-gray-500 ml-1">(#{{ player.jersey_number }})</span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="participation-status flex items-center text-sm">
+                                                    <span class="status-text text-orange-600 font-semibold">Substitute</span>
+                                                    <i class="fas fa-exclamation-circle text-orange-500 ml-1"></i>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Team 2 Participation -->
+                                <div class="bg-white rounded-xl p-4 border border-red-200">
+                                    <h5 class="font-bold text-red-800 mb-3 text-center">
+                                        <i class="fas fa-sword mr-2"></i>{{ team2.name or 'Team Red' }}
+                                    </h5>
+                                    <div id="team2Participation" class="space-y-2">
+                                        {% if team2_players %}
+                                            {% for player in team2_players %}
+                                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg player-participation-item" data-player-id="{{ player.id }}" data-team="2">
+                                                <div class="flex items-center">
+                                                    <span class="font-semibold text-gray-800">{{ player.name }}</span>
+                                                    {% if player.jersey_number %}
+                                                    <span class="text-xs text-gray-500 ml-1">(#{{ player.jersey_number }})</span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="participation-status flex items-center text-sm">
+                                                    <span class="status-text text-orange-600 font-semibold">Substitute</span>
+                                                    <i class="fas fa-exclamation-circle text-orange-500 ml-1"></i>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Participation Summary -->
+                            <div class="mt-4 bg-white rounded-xl p-4 border border-indigo-200">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                    <div>
+                                        <div id="team1PlayingCount" class="text-lg font-bold text-green-600">0</div>
+                                        <div class="text-xs text-gray-600">{{ team1.name }} Playing</div>
+                                    </div>
+                                    <div>
+                                        <div id="team1SubstituteCount" class="text-lg font-bold text-orange-600">{{ team1_players|length if team1_players else 0 }}</div>
+                                        <div class="text-xs text-gray-600">{{ team1.name }} Subs</div>
+                                    </div>
+                                    <div>
+                                        <div id="team2PlayingCount" class="text-lg font-bold text-green-600">0</div>
+                                        <div class="text-xs text-gray-600">{{ team2.name }} Playing</div>
+                                    </div>
+                                    <div>
+                                        <div id="team2SubstituteCount" class="text-lg font-bold text-orange-600">{{ team2_players|length if team2_players else 0 }}</div>
+                                        <div class="text-xs text-gray-600">{{ team2.name }} Subs</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Team Summary -->
+                        <div id="teamSummary" class="mt-8 bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl p-6 border-2 border-purple-200">
+                            <div class="text-center">
+                                <h4 class="text-lg font-bold text-purple-800 mb-4">
+                                    <i class="fas fa-trophy mr-2"></i>Team Match Summary
+                                </h4>
+                                <div class="grid grid-cols-3 items-center gap-4">
+                                    <div class="text-center">
+                                        <div id="team1Summary" class="text-2xl font-bold text-blue-800">0</div>
+                                        <div class="text-sm text-gray-600">{{ team1.name or 'Team Blue' }}</div>
+                                        <div id="team1SummaryType" class="text-xs text-blue-600 mt-1">Wins</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-500 rounded-full flex items-center justify-center mx-auto">
+                                            <i class="fas fa-vs text-white"></i>
+                                        </div>
+                                        <div id="overallOutcome" class="text-sm text-purple-600 mt-1 font-semibold">-</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div id="team2Summary" class="text-2xl font-bold text-red-800">0</div>
+                                        <div class="text-sm text-gray-600">{{ team2.name or 'Team Red' }}</div>
+                                        <div id="team2SummaryType" class="text-xs text-red-600 mt-1">Wins</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Additional Stats -->
+                                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-white rounded-lg p-4 border border-purple-200">
+                                        <div class="text-lg font-bold text-gray-800" id="totalMatches">0</div>
+                                        <div class="text-sm text-gray-600">Total Matches</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-4 border border-purple-200">
+                                        <div class="text-lg font-bold text-gray-800" id="totalGoals">0 - 0</div>
+                                        <div class="text-sm text-gray-600">Total Goals</div>
+                                    </div>
+                                    <div class="bg-white rounded-lg p-4 border border-purple-200">
+                                        <div class="text-lg font-bold text-gray-800" id="drawCount">0</div>
+                                        <div class="text-sm text-gray-600">Draws</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 p-3 bg-white rounded-lg border border-purple-200">
+                                    <div class="text-sm text-purple-700">
+                                        <strong>Scoring System:</strong> 
+                                        <span id="scoringSystemInfo">
+                                            {% if tournament.scoring_system == 'goal_based' %}
+                                                Goal-Based (Team score = Total goals from all matches)
+                                            {% else %}
+                                                Win-Based (Team score = Match wins × 3 + Draws × 1)
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden team scores for form submission -->
+                        <input type="hidden" name="team1_score" id="team1_score" value="{{ match.team1_score if match.team1_score is not none else '0' }}">
+                        <input type="hidden" name="team2_score" id="team2_score" value="{{ match.team2_score if match.team2_score is not none else '0' }}">
+                        <input type="hidden" name="has_sub_matches" id="has_sub_matches" value="true">
+                    </div>
+                    
+                    {% else %}
+                    <!-- Solo Tournament - Regular Score Entry -->
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fas fa-trophy text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Match Result</h3>
+                        <p class="text-gray-600">Enter the final scores for both players</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-blue-50 via-white to-red-50 rounded-2xl p-8 border border-green-100">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                            <!-- Player 1 Score -->
+                            <div class="text-center">
+                                <label class="block text-lg font-bold text-blue-700 mb-4">
+                                    <i class="fas fa-user mr-2"></i>Player 1
+                                </label>
+                                <div class="relative group">
+                                    <input type="number" 
+                                           name="team1_score" 
+                                           id="team1_score"
+                                           value="{{ match.team1_score if match.team1_score is not none else '' }}"
+                                           min="0" 
+                                           max="99"
+                                           class="score-input block w-full text-center text-4xl font-black py-6 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-200"
+                                           placeholder="0"
+                                           required>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity pointer-events-none"></div>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-500 font-medium">Final Score</div>
+                            </div>
+
+                            <!-- Enhanced Separator -->
+                            <div class="text-center relative">
+                                <div class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto shadow-lg border-2 border-white">
+                                    <span class="text-3xl font-black text-gray-600">-</span>
+                                </div>
+                                <div class="mt-2 text-xs text-gray-400 font-semibold uppercase tracking-wider">Versus</div>
+                                <!-- Animated dots -->
+                                <div class="absolute top-8 left-1/2 transform -translate-x-1/2">
+                                    <div class="flex space-x-1">
+                                        <div class="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                                        <div class="w-1 h-1 bg-green-400 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                                        <div class="w-1 h-1 bg-green-400 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Player 2 Score -->
+                            <div class="text-center">
+                                <label class="block text-lg font-bold text-red-700 mb-4">
+                                    <i class="fas fa-user mr-2"></i>Player 2
+                                </label>
+                                <div class="relative group">
+                                    <input type="number" 
+                                           name="team2_score" 
+                                           id="team2_score"
+                                           value="{{ match.team2_score if match.team2_score is not none else '' }}"
+                                           min="0" 
+                                           max="99"
+                                           class="score-input block w-full text-center text-4xl font-black py-6 rounded-2xl focus:outline-none focus:ring-4 focus:ring-red-200"
+                                           placeholder="0"
+                                           required>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-red-400 to-red-600 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity pointer-events-none"></div>
+                                </div>
+                                <div class="mt-3 text-sm text-gray-500 font-medium">Final Score</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+
+
+                <!-- Enhanced Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t-2 border-green-100">
+                    <a href="{{ url_for('tournament.matches', tournament_id=tournament.id) }}" 
+                       class="inline-flex items-center px-8 py-4 border-2 border-gray-300 rounded-2xl text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Matches
+                    </a>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        {% if match.status == 'completed' %}
+                        <button type="button" 
+                                onclick="resetMatch()"
+                                class="inline-flex items-center px-6 py-4 border-2 border-red-300 rounded-2xl text-sm font-bold text-red-700 bg-white hover:bg-red-50 hover:border-red-400 focus:outline-none focus:ring-4 focus:ring-red-200 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg">
+                            <i class="fas fa-undo mr-2"></i>
+                            Reset Match
+                        </button>
+                        {% endif %}
+                        
+                        <button type="submit" 
+                                class="btn-primary inline-flex items-center px-10 py-4 border-2 border-transparent rounded-2xl text-sm font-black text-white shadow-2xl focus:outline-none focus:ring-4 focus:ring-green-200">
+                            <i class="fas fa-save mr-3 text-lg"></i>
+                            {% if match.status == 'completed' %}Update Match Result{% else %}Save Match Result{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Enhanced Winner Preview -->
+        <div id="winnerPreview" class="hidden mt-8 p-8 bg-gradient-to-r from-green-50 to-green-50 border-2 border-green-200 rounded-2xl shadow-lg animate-fadeIn">
+            <div class="flex items-center justify-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center mr-4 shadow-lg animate-pulse">
+                    <i class="fas fa-trophy text-white text-2xl"></i>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm font-semibold text-green-600 uppercase tracking-wide mb-1">Match Winner</div>
+                    <div id="winnerText" class="text-2xl font-black text-green-800"></div>
+                </div>
+            </div>
+            <div class="mt-4 text-center text-sm text-green-600 font-medium">
+                🎉 Congratulations! This result will be saved when you submit the form.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form handling
+document.getElementById('resultForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Check tournament type
+    const isTeamTournament = '{{ tournament.type }}' === 'team';
+    
+    if (isTeamTournament) {
+        // For team tournaments, validate multi-match data
+        const hasSubMatches = document.getElementById('has_sub_matches').value === 'true';
+        
+        if (hasSubMatches) {
+            // Check if there are any sub-matches
+            const subMatchCards = document.querySelectorAll('.sub-match-card');
+            if (subMatchCards.length === 0) {
+                alert('Please add at least one player match before saving the result.');
+                return;
+            }
+            
+            // Validate all sub-matches have players selected
+            let validMatches = 0;
+            for (let i = 0; i < subMatchCards.length; i++) {
+                const card = subMatchCards[i];
+                const team1Player = card.querySelector('.team1-player-select').value;
+                const team2Player = card.querySelector('.team2-player-select').value;
+                
+                if (team1Player && team2Player) {
+                    validMatches++;
+                } else {
+                    alert(`Please select both players for Match ${i + 1} before saving.`);
+                    return;
+                }
+            }
+            
+            if (validMatches === 0) {
+                alert('Please complete at least one player match.');
+                return;
+            }
+            
+            // Log form data for debugging
+            console.log('Submitting team match with sub-matches:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+        }
+    } else {
+        // For solo tournaments, validate scores
+        const team1Score = parseInt(formData.get('team1_score'));
+        const team2Score = parseInt(formData.get('team2_score'));
+        
+        if (isNaN(team1Score) || isNaN(team2Score)) {
+            alert('Please enter valid scores for both players');
+            return;
+        }
+        
+        if (team1Score < 0 || team2Score < 0) {
+            alert('Scores cannot be negative');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Enhanced progress feedback
+    let progressStep = 1;
+    const progressMessages = [
+        'Validating data...',
+        'Processing sub-matches...',
+        'Saving to database...',
+        'Finalizing results...'
+    ];
+    
+    function updateProgress() {
+        if (progressStep < progressMessages.length) {
+            submitButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>${progressMessages[progressStep - 1]}`;
+            progressStep++;
+        }
+    }
+    
+    updateProgress();
+    const progressInterval = setInterval(updateProgress, 2000);
+    submitButton.disabled = true;
+    
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+        clearInterval(progressInterval);
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+        alert('Save operation timed out. Please try again or check your internet connection.');
+    }, 30000); // 30 second timeout
+    
+    // Submit the result
+    fetch('{{ url_for("tournament.save_match_result", tournament_id=tournament.id, match_id=match.id) }}', {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal
+    })
+    .then(response => {
+        clearTimeout(timeoutId);
+        clearInterval(progressInterval);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        
+        if (data.success) {
+            // Show success message and redirect
+            submitButton.innerHTML = '<i class="fas fa-check mr-2"></i>Success!';
+            setTimeout(() => {
+                alert('Match result saved successfully!' + (data.message ? ' ' + data.message : ''));
+                window.location.href = '{{ url_for("tournament.matches", tournament_id=tournament.id) }}';
+            }, 500);
+        } else {
+            alert('Error: ' + (data.error || 'Failed to save match result'));
+            // Reset button
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+        }
+    })
+    .catch(error => {
+        clearTimeout(timeoutId);
+        clearInterval(progressInterval);
+        
+        if (error.name === 'AbortError') {
+            console.log('Save operation was aborted due to timeout');
+            return; // Timeout already handled above
+        }
+        
+        console.error('Fetch Error:', error);
+        
+        let errorMessage = 'Failed to save match result.';
+        if (error.message.includes('HTTP')) {
+            errorMessage = `Server error: ${error.message}`;
+        } else if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+            errorMessage = 'Network error. Please check your internet connection and try again.';
+        }
+        
+        alert(errorMessage);
+        
+        // Reset button
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+    });
+});
+
+// Winner preview for solo tournaments
+
+// Real-time winner preview (for both team and solo tournaments)
+function updateWinnerPreview() {
+    const team1Score = parseInt(document.getElementById('team1_score').value) || 0;
+    const team2Score = parseInt(document.getElementById('team2_score').value) || 0;
+    const winnerPreview = document.getElementById('winnerPreview');
+    const winnerText = document.getElementById('winnerText');
+    
+    if (team1Score > 0 || team2Score > 0) {
+        if (team1Score > team2Score) {
+            winnerText.textContent = '{{ team1.name }} Wins!';
+            winnerPreview.classList.remove('hidden');
+        } else if (team2Score > team1Score) {
+            winnerText.textContent = '{{ team2.name }} Wins!';
+            winnerPreview.classList.remove('hidden');
+        } else if (team1Score === team2Score && team1Score > 0) {
+            winnerText.textContent = 'Draw!';
+            winnerText.innerHTML = '<i class="fas fa-handshake mr-2"></i>Draw!';
+            winnerPreview.classList.remove('hidden');
+        } else {
+            winnerPreview.classList.add('hidden');
+        }
+    } else {
+        winnerPreview.classList.add('hidden');
+    }
+}
+
+// Reset match function (keep this as it's useful)
+function resetMatch() {
+    if (confirm('Reset this match to pending status? This will clear all result data.')) {
+        fetch('{{ url_for("tournament.reset_match", tournament_id=tournament.id, match_id=match.id) }}', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Match reset successfully!');
+                window.location.href = '{{ url_for("tournament.matches", tournament_id=tournament.id) }}';
+            } else {
+                alert('Error: ' + (data.error || 'Failed to reset match'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to reset match');
+        });
+    }
+}
+
+// Initialize for solo tournaments
+document.addEventListener('DOMContentLoaded', function() {
+    if ('{{ tournament.type }}' === 'solo') {
+        // Solo tournaments: listen to score inputs for winner preview
+        document.getElementById('team1_score').addEventListener('input', updateWinnerPreview);
+        document.getElementById('team2_score').addEventListener('input', updateWinnerPreview);
+        updateWinnerPreview();
+    }
+    // Team tournaments will be handled by multi-match.js
+});
+</script>
+{% endblock %}

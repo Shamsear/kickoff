@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}About - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-0{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Enhanced gradient backgrounds with animated patterns */
+    .hero-gradient {
+        background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%);
+        position: relative;
+        overflow: hidden;
+        animation: gradientShift 8s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 25%, #99f6e4 50%, #5eead4 75%, #2dd4bf 100%); }
+        50% { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 25%, #86efac 50%, #4ade80 75%, #10b981 100%); }
+    }
+    
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.03'%3E%3Cpolygon fill='%23fff' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    
+    /* Enhanced feature card styling with glassmorphism */
+    .feature-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .feature-card:hover::before {
+        left: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 32px 64px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    .floating-shape {
+        position: absolute;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) { top: 15%; left: 10%; }
+    .floating-shape:nth-child(2) { top: 50%; right: 15%; animation-delay: 1s; }
+    .floating-shape:nth-child(3) { bottom: 10%; left: 30%; animation-delay: 2s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- About Header with Breadcrumbs -->
+    <div class="hero-gradient shadow">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-16 h-16 bg-white rounded-full"></div>
+        <div class="floating-shape w-12 h-12 bg-yellow-300 rounded-full"></div>
+        <div class="floating-shape w-20 h-20 bg-white rounded-full"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumb -->
+            <nav class="flex pt-20 pb-3" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <div>
+                            <a href="{{ url_for('main.index') }}" class="text-gray-600 hover:text-gray-700 text-sm">
+                                <i class="fas fa-home"></i>
+                                <span class="sr-only">Home</span>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 text-xs mx-3"></i>
+                            <span class="text-sm font-semibold text-gray-900">About</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            
+            <!-- Header Content -->
+            <div class="md:flex md:items-center md:justify-between pb-8">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900">
+                        <i class="fas fa-heart text-green-600 mr-3"></i>
+                        About Kickoff Arena
+                    </h1>
+                    <p class="mt-2 text-base text-gray-700">
+                        The future of tournament management - democratizing professional tournament organization for everyone.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Mission Statement -->
+        <div class="bg-white rounded-xl shadow p-8 mb-12 feature-card">
+            <div class="text-center mb-8">
+                <div class="bg-green-100 text-green-600 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <i class="fas fa-bullseye text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
+            </div>
+            <div class="max-w-4xl mx-auto text-center">
+                <p class="text-xl text-gray-700 mb-6 leading-relaxed">
+                    Kickoff Arena was created to <strong>democratize tournament management</strong>. We believe that organizing 
+                    professional-quality tournaments shouldn't require expensive software, technical expertise, or huge budgets.
+                </p>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    Our platform empowers organizers worldwide to create engaging, well-managed tournaments 
+                    that bring communities together through the power of competition. Whether you're running a local soccer league 
+                    or an international esports championship, Kickoff Arena provides all the tools you need - completely free.
+                </p>
+            </div>
+        </div>
+
+        <!-- Core Values -->
+        <div class="mb-16">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">What We Stand For</h2>
+                <p class="text-xl text-gray-600">The principles that guide everything we build</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white rounded-xl shadow p-6 feature-card text-center">
+                    <div class="bg-green-100 text-green-600 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Community First</h3>
+                    <p class="text-gray-600">
+                        Built by tournament organizers, for tournament organizers. Every feature 
+                        is designed with real-world needs in mind.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-6 feature-card text-center">
+                    <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-heart text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Always Free</h3>
+                    <p class="text-gray-600">
+                        Core tournament management should be accessible to everyone. 
+                        No hidden fees, no premium tiers for basic features.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-6 feature-card text-center">
+                    <div class="bg-purple-100 text-purple-600 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-zap text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Simple & Powerful</h3>
+                    <p class="text-gray-600">
+                        Professional features shouldn't require a computer science degree. 
+                        Easy to use, yet powerful enough for any tournament.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow p-6 feature-card text-center">
+                    <div class="bg-yellow-100 text-yellow-600 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-globe text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Global Scale</h3>
+                    <p class="text-gray-600">
+                        From local youth leagues to international championships. 
+                        Kickoff Arena scales to meet any tournament size or complexity.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Our Story -->
+        <div class="bg-white rounded-xl shadow p-8 mb-12 feature-card">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Story</h2>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+                    Kickoff Arena started when our founder got frustrated trying to organize a simple soccer tournament 
+                    for his local community. Existing solutions were either too expensive, too complicated, or missing 
+                    essential features that real organizers needed.
+                </p>
+                <p class="text-lg text-gray-700 mb-6 leading-relaxed">
+                    We realized that tournament management tools should be accessible to everyone - from parents 
+                    organizing youth leagues to professional event coordinators running major championships. 
+                    That's why we built Kickoff Arena to be both powerful and approachable.
+                </p>
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    Today, thousands of organizers worldwide use Kickoff Arena to run their tournaments. 
+                    From small local competitions to large-scale esports events, our platform adapts to meet 
+                    the unique needs of every tournament organizer.
+                </p>
+            </div>
+        </div>
+
+        <!-- Join the Community CTA -->
+        <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-12 text-center feature-card">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-green-600 text-white w-20 h-20 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-users text-3xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Join Our Growing Community</h2>
+                <p class="text-xl text-gray-700 mb-8 leading-relaxed">
+                    Connect with thousands of tournament organizers around the world. Share experiences, 
+                    get tips, and help shape the future of tournament management.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+                    <a href="{{ url_for('auth.register') if not session.user_id else url_for('tournament.create') }}"
+                       class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5">
+                        <i class="fas fa-rocket mr-2"></i>{{ 'Get Started Free' if not session.user_id else 'Create Tournament' }}
+                    </a>
+                    <a href="{{ url_for('main.contact') }}" 
+                       class="inline-flex items-center justify-center px-8 py-4 border border-green-600 text-lg font-semibold rounded-xl text-green-600 bg-white hover:bg-green-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-sm transition-all duration-200">
+                        <i class="fas fa-envelope mr-2"></i>Contact Us
+                    </a>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <p>✨ Free forever &nbsp;•&nbsp; 🏆 Unlimited tournaments &nbsp;•&nbsp; 🚀 Professional features included</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

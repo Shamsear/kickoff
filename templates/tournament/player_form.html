@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block title %}{% if player %}Edit Player{% else %}Add New Player{% endif %} - {{ tournament.name }} - Kickoff Arena{% endblock %}
+
+{% block main_class %}pt-16{% endblock %}
+
+{% block extra_head %}
+<style>
+        /* Enhanced modern styling */
+        .feature-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-shape:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-shape:nth-child(2) { top: 60%; right: 10%; animation-delay: 2s; }
+        .floating-shape:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            transition: all 0.3s ease;
+        }
+        
+        .form-section:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            pointer-events: none;
+            color: inherit;
+        }
+        
+        .has-icon {
+            padding-left: 48px !important;
+        }
+        
+        .custom-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 16px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 44px !important;
+            appearance: none;
+        }
+        
+        .progress-step {
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .progress-step.completed {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100">
+    
+    <!-- Hero Section -->
+    <div class="hero-gradient text-white py-16 relative">
+        <!-- Floating shapes -->
+        <div class="floating-shape w-32 h-32 bg-white rounded-full"></div>
+        <div class="floating-shape w-24 h-24 bg-white rounded-lg"></div>
+        <div class="floating-shape w-40 h-40 bg-white rounded-full"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center space-x-2 text-sm mb-8 text-blue-100">
+                <a href="{{ url_for('main.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+                    <i class="fas fa-home mr-1"></i>
+                    Dashboard
+                </a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <a href="{{ url_for('tournament.view', tournament_id=tournament.id) }}" class="hover:text-white transition-colors">{{ tournament.name }}</a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <a href="{{ url_for('tournament.teams', tournament_id=tournament.id) }}" class="hover:text-white transition-colors">Teams</a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <a href="{{ url_for('tournament.team_players', tournament_id=tournament.id, team_id=team.id) }}" class="hover:text-white transition-colors">{{ team.name }} Players</a>
+                <i class="fas fa-chevron-right text-blue-300"></i>
+                <span class="text-white">{% if player %}Edit Player{% else %}Add Player{% endif %}</span>
+            </nav>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mr-4">
+                            <i class="fas fa-user-plus text-3xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-black mb-2">
+                                {% if player %}
+                                    Edit Player: {{ player.name }}
+                                {% else %}
+                                    Add New Player
+                                {% endif %}
+                            </h1>
+                            <p class="text-xl text-blue-100">
+                                Managing player for <span class="font-bold">{{ team.name }}</span> in {{ tournament.name }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hidden lg:flex items-center space-x-4">
+                    <div class="stats-card rounded-2xl p-6 text-gray-800">
+                        <div class="text-2xl font-black text-blue-600 mb-1">{{ players_count or 0 }}</div>
+                        <div class="text-sm font-bold text-gray-600">Current Players</div>
+                    </div>
+                    <div class="stats-card rounded-2xl p-6 text-gray-800">
+                        <div class="text-2xl font-black text-green-600 mb-1">{{ tournament.max_players_per_team }}</div>
+                        <div class="text-sm font-bold text-gray-600">Max Allowed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-12">
+        
+        <!-- Progress Indicator -->
+        <div class="mb-12">
+            <div class="flex items-center justify-center space-x-4 mb-8">
+                <div class="progress-step active w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">
+                    1
+                </div>
+                <div class="w-16 h-1 bg-gray-300 rounded-full">
+                    <div class="w-full h-full bg-green-500 rounded-full"></div>
+                </div>
+                <div class="progress-step w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-300 text-gray-500">
+                    2
+                </div>
+                <div class="w-16 h-1 bg-gray-300 rounded-full"></div>
+                <div class="progress-step w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm bg-gray-300 text-gray-500">
+                    3
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="text-lg font-black text-gray-800 mb-1">Basic Information</div>
+                <div class="text-sm text-gray-600">Enter player's personal and contact details</div>
+            </div>
+        </div>
+        
+        <!-- Player Form -->
+        <div class="max-w-4xl mx-auto">
+            <form id="playerForm" class="space-y-8" method="POST">
+                
+                <!-- Basic Information Section -->
+                <div class="form-section rounded-2xl shadow-lg p-8">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4">
+                            <i class="fas fa-user text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900">Basic Information</h2>
+                            <p class="text-gray-600">Essential player details and identification</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Full Name -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Full Name *
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-user input-icon text-blue-500"></i>
+                                <input type="text" name="name" id="playerName" required
+                                       value="{% if player %}{{ player.name }}{% endif %}"
+                                       placeholder="Enter player's full name"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Jersey Number -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Jersey Number
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-tshirt input-icon text-blue-500"></i>
+                                <input type="number" name="jersey_number" id="jerseyNumber" min="1" max="99"
+                                       value="{% if player %}{{ player.jersey_number }}{% endif %}"
+                                       placeholder="99"
+                                       class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all">
+                            </div>
+                        </div>
+                        
+                        <!-- Position -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-800 mb-2">
+                                Position
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-running input-icon text-purple-500"></i>
+                                <select name="position" id="position" class="w-full has-icon px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 font-medium transition-all custom-select">
+                                    <option value="">Select Position</option>
+                                    <option value="Goalkeeper" {% if player and player.position == 'Goalkeeper' %}selected{% endif %}>🥅 Goalkeeper</option>
+                                    <option value="Defender" {% if player and player.position == 'Defender' %}selected{% endif %}>🛡️ Defender</option>
+                                    <option value="Midfielder" {% if player and player.position == 'Midfielder' %}selected{% endif %}>⚽ Midfielder</option>
+                                    <option value="Forward" {% if player and player.position == 'Forward' %}selected{% endif %}>🏃 Forward</option>
+                                    <option value="Winger" {% if player and player.position == 'Winger' %}selected{% endif %}>💨 Winger</option>
+                                    <option value="Striker" {% if player and player.position == 'Striker' %}selected{% endif %}>🎯 Striker</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Note -->
+                        <div class="md:col-span-1">
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-blue-500 mr-3 mt-0.5"></i>
+                                    <div class="text-sm text-blue-700">
+                                        <p class="font-semibold mb-1">Quick Setup</p>
+                                        <p>Only player name is required. Jersey number and position are optional but recommended for better organization.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="feature-card rounded-2xl shadow-lg p-8">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span>{% if player %}Changes will be saved immediately{% else %}Player will be added to {{ team.name }}{% endif %}</span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <a href="{{ url_for('tournament.team_players', tournament_id=tournament.id, team_id=team.id) }}" 
+                               class="inline-flex items-center px-6 py-3 border-2 border-gray-300 rounded-xl shadow-sm text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                                <i class="fas fa-arrow-left mr-2"></i>
+                                Back to Players
+                            </a>
+                            
+                            <button type="submit" 
+                                    class="btn-primary inline-flex items-center px-8 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white">
+                                <i class="fas fa-{% if player %}save{% else %}plus{% endif %} mr-2"></i>
+                                {% if player %}Update Player{% else %}Add Player{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+    <!-- Success Message Template -->
+    <div id="successMessage" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg hidden">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>Player saved successfully!</span>
+        </div>
+    </div>
+    
+    <!-- Error Message Template -->
+    <div id="errorMessage" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg hidden">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="errorText">An error occurred. Please try again.</span>
+        </div>
+    </div>
+
+    <script>
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('playerForm');
+            const nameInput = document.getElementById('playerName');
+            const jerseyInput = document.getElementById('jerseyNumber');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            
+            // Real-time validation
+            nameInput.addEventListener('input', function() {
+                validateField(this, this.value.trim().length >= 2, 'Name must be at least 2 characters');
+            });
+            
+            jerseyInput.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                validateField(this, value >= 1 && value <= 99, 'Jersey number must be between 1 and 99');
+            });
+            
+            emailInput.addEventListener('input', function() {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                validateField(this, !this.value || emailRegex.test(this.value), 'Please enter a valid email address');
+            });
+            
+            phoneInput.addEventListener('input', function() {
+                const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+                validateField(this, !this.value || phoneRegex.test(this.value.replace(/[\s\-\(\)]/g, '')), 'Please enter a valid phone number');
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+                    submitBtn.disabled = true;
+                    
+                    // Just submit the form normally
+                    setTimeout(() => {
+                        this.submit();
+                    }, 100);
+                }
+            });
+            
+            // Validation helper function
+            function validateField(field, isValid, errorMessage) {
+                const errorDiv = field.parentNode.querySelector('.error-message');
+                
+                if (isValid) {
+                    field.classList.remove('border-red-500');
+                    field.classList.add('border-gray-300');
+                    if (errorDiv) errorDiv.remove();
+                } else {
+                    field.classList.remove('border-gray-300');
+                    field.classList.add('border-red-500');
+                    
+                    if (!errorDiv) {
+                        const error = document.createElement('div');
+                        error.className = 'error-message text-red-500 text-xs mt-1';
+                        error.textContent = errorMessage;
+                        field.parentNode.appendChild(error);
+                    }
+                }
+            }
+            
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                
+                if (nameInput.value.trim().length < 2) {
+                    validateField(nameInput, false, 'Name is required');
+                    isValid = false;
+                }
+                
+                if (jerseyInput.value && (parseInt(jerseyInput.value) < 1 || parseInt(jerseyInput.value) > 99)) {
+                    validateField(jerseyInput, false, 'Jersey number must be between 1 and 99');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Message display
+            function showMessage(type, message) {
+                const messageDiv = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+                if (type === 'error') {
+                    document.getElementById('errorText').textContent = message;
+                }
+                
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 5000);
+            }
+            
+            // Auto-calculate age from date of birth
+            document.getElementById('dateOfBirth').addEventListener('change', function() {
+                if (this.value) {
+                    const today = new Date();
+                    const birthDate = new Date(this.value);
+                    const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+                    
+                    // You can display the age somewhere or store it
+                    console.log('Calculated age:', age);
+                }
+            });
+        });
+    </script>
+</div>
+{% endblock %}
