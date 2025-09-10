@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from routes.auth import login_required, get_current_user
 from database import db
-from PIL import Image
+# from PIL import Image  # Temporarily disabled for deployment
 import os
 import uuid
 from datetime import datetime
@@ -278,19 +278,10 @@ def manage_news(tournament_id):
 # Helper functions
 def process_uploaded_image(file_path):
     """Process uploaded image (resize if too large)"""
-    try:
-        with Image.open(file_path) as img:
-            # Convert to RGB if necessary
-            if img.mode in ('RGBA', 'LA', 'P'):
-                img = img.convert('RGB')
-            
-            # Resize if image is too large
-            max_size = (1920, 1080)
-            if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
-                img.thumbnail(max_size, Image.Resampling.LANCZOS)
-                img.save(file_path, 'JPEG', quality=85, optimize=True)
-    except Exception as e:
-        print(f"Error processing image {file_path}: {e}")
+    # Temporarily disabled - Pillow not available during deployment
+    # TODO: Re-enable once Pillow deployment issue is resolved
+    print(f"Image processing skipped for: {file_path}")
+    return True
 
 def get_tournament_media(tournament_id):
     """Get all media files for a tournament"""
